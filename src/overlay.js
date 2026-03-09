@@ -21,6 +21,7 @@ const MOSAIC_BLOCK_SIZE = 14;
 
 const state = {
   sessionId: null,
+  ready: false,
   selection: null,
   mode: 'rect',
   drawingSelection: false,
@@ -464,6 +465,10 @@ async function saveSelection() {
 }
 
 stage.addEventListener('mousedown', (event) => {
+  if (!state.ready) {
+    return;
+  }
+
   if (event.button !== 0) {
     return;
   }
@@ -488,6 +493,10 @@ stage.addEventListener('mousedown', (event) => {
 });
 
 window.addEventListener('mousemove', (event) => {
+  if (!state.ready) {
+    return;
+  }
+
   const pointerX = clamp(event.clientX, 0, window.innerWidth);
   const pointerY = clamp(event.clientY, 0, window.innerHeight);
 
@@ -503,6 +512,10 @@ window.addEventListener('mousemove', (event) => {
 });
 
 window.addEventListener('mouseup', () => {
+  if (!state.ready) {
+    return;
+  }
+
   if (state.drawingAnnotation && state.draftAnnotation) {
     state.annotations.push(state.draftAnnotation);
   }
@@ -515,6 +528,10 @@ window.addEventListener('mouseup', () => {
 });
 
 window.addEventListener('keydown', async (event) => {
+  if (!state.ready && event.key !== 'Escape') {
+    return;
+  }
+
   if (event.key === 'Escape') {
     event.preventDefault();
     await cancelCapture();
@@ -601,6 +618,7 @@ cancelButton.addEventListener('click', async (event) => {
 
 window.qqShot.onCaptureData(async (payload) => {
   state.sessionId = payload.sessionId;
+  state.ready = false;
   state.selection = null;
   state.drawingSelection = false;
   state.drawingAnnotation = false;
@@ -619,5 +637,6 @@ window.qqShot.onCaptureData(async (payload) => {
     image: { width: imageLayer.naturalWidth, height: imageLayer.naturalHeight },
   });
 
+  state.ready = true;
   await window.qqShot.overlayReady(state.sessionId);
 });
