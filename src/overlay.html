@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: file:; style-src 'self'; script-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>可鑫的截屏小工具 - Overlay</title>
+    <link rel="stylesheet" href="./overlay.css" />
+  </head>
+  <body>
+    <main id="stage" class="stage">
+      <img id="imageLayer" class="image-layer" alt="" />
+      <div id="mask" class="mask"></div>
+      <div id="selection" class="selection hidden">
+        <img id="selectionImage" class="selection-image" alt="" />
+        <canvas id="mosaicLayer" class="mosaic-layer"></canvas>
+        <div id="selectionBorder" class="selection-border"></div>
+        <svg id="annotationLayer" class="annotation-layer" aria-hidden="true"></svg>
+      </div>
+      <div id="dimensions" class="dimensions hidden"></div>
+      <div id="toolbar" class="toolbar hidden">
+        <button id="undoButton" class="tool icon-tool" title="撤销一步">
+          <span class="undo-icon" aria-hidden="true"></span>
+        </button>
+        <button id="rectButton" class="tool icon-tool" title="红框">
+          <span class="rect-icon" aria-hidden="true"></span>
+        </button>
+        <button id="arrowButton" class="tool icon-tool" title="红色箭头">
+          <span class="arrow-icon" aria-hidden="true"></span>
+        </button>
+        <button id="mosaicButton" class="tool icon-tool" title="马赛克">
+          <span class="mosaic-icon" aria-hidden="true"></span>
+        </button>
+        <button id="copyButton" class="tool primary">复制</button>
+        <button id="saveButton" class="tool">保存</button>
+        <button id="cancelButton" class="tool ghost">取消</button>
+      </div>
+      <div class="hint">
+        拖拽选区截图，选中后可画红框、红色箭头和马赛克 · <span>Cmd/Ctrl + Z 撤销</span> · <span>Enter 复制</span> · <span>Cmd/Ctrl + S 保存</span>
+      </div>
+    </main>
+
+    <script src="./overlay.js"></script>
+  </body>
+</html>

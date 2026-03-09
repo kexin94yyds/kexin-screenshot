@@ -1,0 +1,244 @@
+:root {
+  color-scheme: light;
+  --paper: #eff1f4;
+  --panel: rgba(255, 255, 255, 0.92);
+  --surface: rgba(247, 248, 250, 0.92);
+  --ink: #17191c;
+  --muted: #6e7681;
+  --line: rgba(23, 25, 28, 0.09);
+  --accent: #111318;
+  --accent-strong: #000000;
+  --ok: #2c6b4f;
+  --warn: #946200;
+  --bad: #a13f3f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family:
+    'SF Pro Display',
+    'PingFang SC',
+    'Microsoft YaHei',
+    sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.82), transparent 32%),
+    linear-gradient(180deg, #f6f7f9 0%, var(--paper) 100%);
+}
+
+body {
+  min-height: 100vh;
+}
+
+.shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.panel {
+  width: 100%;
+  max-width: 720px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--panel);
+  box-shadow:
+    0 16px 40px rgba(16, 18, 21, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(18px);
+}
+
+.panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.window-dot {
+  width: 12px;
+  height: 12px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: rgba(23, 25, 28, 0.14);
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 8px 0 0;
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.lead {
+  margin: 14px 0 0;
+  max-width: 460px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.info-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 96px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.shortcut-label,
+.status-label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+code {
+  display: inline-block;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  background: rgba(23, 25, 28, 0.06);
+  color: var(--ink);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 11px;
+  border-radius: 10px;
+  background: rgba(23, 25, 28, 0.06);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.status-pill.ok {
+  color: var(--ok);
+  background: rgba(44, 107, 79, 0.1);
+  border-color: rgba(44, 107, 79, 0.12);
+}
+
+.status-pill.warn {
+  color: var(--warn);
+  background: rgba(148, 98, 0, 0.1);
+  border-color: rgba(148, 98, 0, 0.12);
+}
+
+.status-pill.bad {
+  color: var(--bad);
+  background: rgba(161, 63, 63, 0.1);
+  border-color: rgba(161, 63, 63, 0.12);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+button {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  height: 46px;
+  padding: 0 16px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    background 120ms ease,
+    border-color 120ms ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.55;
+  transform: none;
+}
+
+.primary {
+  color: #ffffff;
+  background: linear-gradient(180deg, #2b3037 0%, var(--accent) 100%);
+  box-shadow: 0 10px 24px rgba(17, 19, 24, 0.16);
+}
+
+.secondary {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.72);
+  border-color: var(--line);
+}
+
+.tip-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+kbd {
+  padding: 3px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(23, 25, 28, 0.12);
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+}
+
+@media (max-width: 560px) {
+  .shell {
+    padding: 12px;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+
+  .meta-grid,
+  .actions {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+}

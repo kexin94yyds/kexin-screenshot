@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>可鑫的截屏小工具</title>
+    <link rel="stylesheet" href="./control.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="eyebrow">Screen Capture</div>
+            <h1>快速截图</h1>
+          </div>
+          <div class="window-dot" aria-hidden="true"></div>
+        </div>
+
+        <p class="lead">像 QQ 一样快速拉起截图，只保留复制与保存这两个核心动作。</p>
+
+        <div class="meta-grid">
+          <div class="info-card shortcut-card">
+            <span class="shortcut-label">快捷键</span>
+            <code id="shortcut">CommandOrControl+K</code>
+          </div>
+
+          <div class="info-card status-card">
+            <span class="status-label">权限状态</span>
+            <div id="permission" class="status-pill">检查权限中...</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="startButton" class="primary">开始截图</button>
+          <button id="settingsButton" class="secondary">打开屏幕录制设置</button>
+        </div>
+
+        <p class="tip-line">
+          <kbd>Esc</kbd> 取消
+          <span>·</span>
+          <kbd>Enter</kbd> 复制
+          <span>·</span>
+          <kbd>Cmd/Ctrl + S</kbd> 保存
+        </p>
+      </section>
+    </main>
+
+    <script src="./control.js"></script>
+  </body>
+</html>
