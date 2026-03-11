@@ -63,8 +63,8 @@ function registerShortcut() {
 
 async function getDisplaySource(display) {
   const thumbnailSize = {
-    width: Math.round(display.bounds.width * display.scaleFactor),
-    height: Math.round(display.bounds.height * display.scaleFactor),
+    width: Math.max(1, Math.round(display.bounds.width * display.scaleFactor)),
+    height: Math.max(1, Math.round(display.bounds.height * display.scaleFactor)),
   };
 
   const sources = await desktopCapturer.getSources({
@@ -128,6 +128,17 @@ function getMacCaptureDisplayIndex(display) {
 }
 
 async function captureDisplayImage(display) {
+  const source = await getDisplaySourceWithRetry(display);
+  if (source?.thumbnail && !source.thumbnail.isEmpty()) {
+    return {
+      image: source.thumbnail,
+      previewSrc: source.thumbnail.toDataURL(),
+      sourceSize: source.thumbnail.getSize(),
+      tempFilePath: null,
+      captureBackend: 'desktopCapturer',
+    };
+  }
+
   if (process.platform === 'darwin') {
     const captureDisplayIndex = getMacCaptureDisplayIndex(display);
     const tempFilePath = path.join(app.getPath('temp'), `qq-shot-${Date.now()}.png`);
@@ -146,20 +157,11 @@ async function captureDisplayImage(display) {
         height: Math.round(display.bounds.height * display.scaleFactor),
       },
       tempFilePath,
+      captureBackend: 'screencapture',
     };
   }
 
-  const source = await getDisplaySourceWithRetry(display);
-  if (!source?.thumbnail || source.thumbnail.isEmpty()) {
-    throw new Error(`Empty screen thumbnail for display ${display.id}`);
-  }
-
-  return {
-    image: source.thumbnail,
-    previewSrc: source.thumbnail.toDataURL(),
-    sourceSize: source.thumbnail.getSize(),
-    tempFilePath: null,
-  };
+  throw new Error(`Empty screen thumbnail for display ${display.id}`);
 }
 
 function createOverlayWindow() {
@@ -297,6 +299,7 @@ async function startCapture() {
     const sourceSize = capture.sourceSize;
 
     console.log(`[${APP_NAME}] capture metrics`, {
+      captureBackend: capture.captureBackend,
       displayBounds: display.bounds,
       scaleFactor: display.scaleFactor,
       expectedSize: {

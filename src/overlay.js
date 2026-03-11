@@ -32,6 +32,38 @@ const state = {
   draftAnnotation: null,
 };
 
+function nextPaint() {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resolve);
+    });
+  });
+}
+
+function waitForImageLoad(image) {
+  if (image.complete && image.naturalWidth > 0) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve, reject) => {
+    const handleLoad = () => {
+      cleanup();
+      resolve();
+    };
+    const handleError = () => {
+      cleanup();
+      reject(new Error('Failed to load capture preview'));
+    };
+    const cleanup = () => {
+      image.removeEventListener('load', handleLoad);
+      image.removeEventListener('error', handleError);
+    };
+
+    image.addEventListener('load', handleLoad);
+    image.addEventListener('error', handleError);
+  });
+}
+
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
@@ -628,9 +660,9 @@ window.qqShot.onCaptureData(async (payload) => {
   setMode('rect');
 
   imageLayer.src = payload.preview.src;
-
-  await imageLayer.decode();
   selectionImage.src = payload.preview.src;
+  await waitForImageLoad(imageLayer);
+  await nextPaint();
   window.qqShot.reportOverlayMetrics({
     viewport: { width: window.innerWidth, height: window.innerHeight },
     displayBounds: payload.display.bounds,
