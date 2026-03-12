@@ -10,7 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     sceneController.prepareOverlay()
     hotkeyManager.onCaptureRequested = { [weak self] in
-      self?.sceneController.toggleOverlay()
+      self?.sceneController.captureCurrentDisplay()
     }
     hotkeyManager.start()
 

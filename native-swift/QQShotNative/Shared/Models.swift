@@ -6,3 +6,8 @@ struct DisplayDescriptor: Identifiable, Equatable {
   let scaleFactor: CGFloat
   let isPrimary: Bool
 }
+
+struct CapturedFrame {
+  let image: CGImage
+  let display: DisplayDescriptor
+}

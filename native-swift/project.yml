@@ -3,7 +3,7 @@ name: QQShotNative
 options:
   bundleIdPrefix: com.kexin
   deploymentTarget:
-    macOS: "13.0"
+    macOS: "14.0"
 
 configs:
   Debug: debug
@@ -12,7 +12,7 @@ configs:
 settings:
   base:
     SWIFT_VERSION: "5.9"
-    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
     PRODUCT_NAME: QQShotNative
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: ""

@@ -1,6 +1,8 @@
 import AppKit
 
 final class OverlayWindow: NSPanel {
+  var onEscape: (() -> Void)?
+
   init(contentRect: NSRect) {
     super.init(
       contentRect: contentRect,
@@ -20,5 +22,14 @@ final class OverlayWindow: NSPanel {
 
   override var canBecomeKey: Bool {
     true
+  }
+
+  override func keyDown(with event: NSEvent) {
+    if event.keyCode == 53 {
+      onEscape?()
+      return
+    }
+
+    super.keyDown(with: event)
   }
 }

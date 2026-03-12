@@ -5,15 +5,22 @@ struct OverlayView: View {
 
   var body: some View {
     ZStack(alignment: .topLeading) {
-      Color.black.opacity(0.18)
-        .ignoresSafeArea()
+      if let capturedImage = selectionState.capturedImage {
+        Image(decorative: capturedImage, scale: 1.0, orientation: .up)
+          .resizable()
+          .scaledToFill()
+          .ignoresSafeArea()
+      } else {
+        Color.black.opacity(0.18)
+          .ignoresSafeArea()
+      }
 
       VStack(alignment: .leading, spacing: 8) {
         Text("QQShot Native")
           .font(.system(size: 28, weight: .semibold))
-        Text("Skeleton running. Next step is wiring ScreenCaptureKit + drag selection.")
+        Text(selectionState.statusMessage)
           .font(.system(size: 14))
-          .foregroundStyle(.secondary)
+          .foregroundColor(selectionState.capturedImage == nil ? .secondary : .white.opacity(0.82))
       }
       .padding(24)
       .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
