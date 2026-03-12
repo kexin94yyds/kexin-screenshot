@@ -24,24 +24,26 @@ struct OverlayView: View {
           selectionSizeLabel
         }
 
-        instructionPanel
+        if selectionState.capturedImage == nil {
+          statusPanel
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        }
       }
       .contentShape(Rectangle())
       .gesture(selectionGesture(in: geometry.size))
     }
   }
 
-  private var instructionPanel: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      Text("QQShot Native")
-        .font(.system(size: 28, weight: .semibold))
+  private var statusPanel: some View {
+    VStack(alignment: .center, spacing: 8) {
       Text(selectionState.statusMessage)
         .font(.system(size: 14))
-        .foregroundColor(selectionState.capturedImage == nil ? .secondary : .white.opacity(0.82))
+        .multilineTextAlignment(.center)
+        .foregroundColor(.primary)
     }
-    .padding(24)
+    .padding(.horizontal, 20)
+    .padding(.vertical, 16)
     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
-    .padding(24)
   }
 
   private var selectionOutline: some View {
