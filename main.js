@@ -28,9 +28,20 @@ let overlayWindowReady = null;
 let captureSession = null;
 let captureStarting = false;
 let shortcutRegistered = false;
+let captureWarmupTimer = null;
+let captureWarmupPromise = null;
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function clearCaptureWarmupTimer() {
+  if (!captureWarmupTimer) {
+    return;
+  }
+
+  clearTimeout(captureWarmupTimer);
+  captureWarmupTimer = null;
 }
 
 function getScreenPermissionStatus() {
@@ -49,6 +60,37 @@ function getAppStatus() {
     screenPermission: getScreenPermissionStatus(),
     captureInProgress: Boolean(captureSession || captureStarting),
   };
+}
+
+async function warmCaptureBackend() {
+  if (captureWarmupPromise || captureSession || captureStarting) {
+    return captureWarmupPromise;
+  }
+
+  if (getScreenPermissionStatus() !== 'granted') {
+    return null;
+  }
+
+  captureWarmupPromise = desktopCapturer
+    .getSources({
+      types: ['screen'],
+      thumbnailSize: { width: 1, height: 1 },
+      fetchWindowIcons: false,
+    })
+    .catch(() => null)
+    .finally(() => {
+      captureWarmupPromise = null;
+    });
+
+  return captureWarmupPromise;
+}
+
+function scheduleCaptureWarmup(delayMs = 0) {
+  clearCaptureWarmupTimer();
+  captureWarmupTimer = setTimeout(() => {
+    captureWarmupTimer = null;
+    void warmCaptureBackend();
+  }, delayMs);
 }
 
 function registerShortcut() {
@@ -258,6 +300,7 @@ function endCaptureSession() {
 
   captureSession = null;
   hideOverlayWindow();
+  scheduleCaptureWarmup(300);
 
   if (tempFilePath) {
     void fs.unlink(tempFilePath).catch(() => {});
@@ -608,6 +651,7 @@ app.whenReady().then(async () => {
   createOverlayWindow();
   await overlayWindowReady;
   hideOverlayWindow();
+  scheduleCaptureWarmup(800);
   registerShortcut();
 });
 
