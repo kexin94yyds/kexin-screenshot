@@ -230,6 +230,7 @@ function hideOverlayWindow() {
     return;
   }
 
+  overlayWindow.setOpacity(0);
   overlayWindow.hide();
 }
 
@@ -328,6 +329,7 @@ async function startCapture() {
     });
 
     currentOverlayWindow.setBounds(display.bounds, false);
+    currentOverlayWindow.setOpacity(0);
     currentOverlayWindow.webContents.send('capture-data', {
       sessionId,
       display: captureSession.display,
@@ -340,6 +342,13 @@ async function startCapture() {
 
     currentOverlayWindow.showInactive();
     currentOverlayWindow.moveTop();
+    void captureSession.overlayReady.then(() => {
+      if (currentOverlayWindow.isDestroyed()) {
+        return;
+      }
+
+      currentOverlayWindow.setOpacity(1);
+    });
     void Promise.race([captureSession.overlayReady, delay(1200)]).then(() => {
       if (currentOverlayWindow.isDestroyed()) {
         return;

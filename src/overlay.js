@@ -659,6 +659,8 @@ window.qqShot.onCaptureData(async (payload) => {
   saveButton.disabled = false;
   setMode('rect');
 
+  imageLayer.removeAttribute('src');
+  selectionImage.removeAttribute('src');
   imageLayer.src = payload.preview.src;
   selectionImage.src = payload.preview.src;
   await waitForImageLoad(imageLayer);
