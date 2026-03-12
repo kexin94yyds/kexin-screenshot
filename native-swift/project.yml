@@ -1,0 +1,58 @@
+name: QQShotNative
+
+options:
+  bundleIdPrefix: com.kexin
+  deploymentTarget:
+    macOS: "13.0"
+
+configs:
+  Debug: debug
+  Release: release
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    PRODUCT_NAME: QQShotNative
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""
+    SWIFT_EMIT_LOC_STRINGS: NO
+
+targets:
+  QQShotNative:
+    type: application
+    platform: macOS
+    sources:
+      - path: QQShotNative
+        excludes:
+          - Resources/QQShot.entitlements
+          - Info.plist
+    info:
+      path: QQShotNative/Info.plist
+    entitlements:
+      path: QQShotNative/Resources/QQShot.entitlements
+    dependencies:
+      - sdk: ScreenCaptureKit.framework
+      - sdk: Carbon.framework
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kexin.qqshotnative
+        GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_ENTITLEMENTS: QQShotNative/Resources/QQShot.entitlements
+        LSApplicationCategoryType: public.app-category.utilities
+
+  QQShotNativeTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: QQShotNative
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kexin.qqshotnative.tests
+        PRODUCT_NAME: QQShotNativeTests
+        PRODUCT_MODULE_NAME: QQShotNativeTests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/QQShotNative.app/Contents/MacOS/QQShotNative"
+        BUNDLE_LOADER: "$(TEST_HOST)"
