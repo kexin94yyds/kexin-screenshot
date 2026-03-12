@@ -202,6 +202,9 @@ function createOverlayWindow() {
     skipTransformProcessType: true,
   });
   overlayWindow.setAlwaysOnTop(true, 'floating', 1);
+  overlayWindow.setOpacity(0);
+  overlayWindow.setIgnoreMouseEvents(true, { forward: true });
+  overlayWindow.setFocusable(false);
   overlayWindow.removeMenu();
 
   overlayWindow.on('closed', () => {
@@ -230,8 +233,12 @@ function hideOverlayWindow() {
     return;
   }
 
+  overlayWindow.setIgnoreMouseEvents(true, { forward: true });
+  overlayWindow.setFocusable(false);
   overlayWindow.setOpacity(0);
-  overlayWindow.hide();
+  if (!overlayWindow.isVisible()) {
+    overlayWindow.showInactive();
+  }
 }
 
 function focusActiveWindow() {
@@ -329,6 +336,8 @@ async function startCapture() {
     });
 
     currentOverlayWindow.setBounds(display.bounds, false);
+    currentOverlayWindow.setFocusable(true);
+    currentOverlayWindow.setIgnoreMouseEvents(false);
     currentOverlayWindow.setOpacity(0);
     currentOverlayWindow.webContents.send('capture-data', {
       sessionId,
@@ -340,7 +349,9 @@ async function startCapture() {
       },
     });
 
-    currentOverlayWindow.showInactive();
+    if (!currentOverlayWindow.isVisible()) {
+      currentOverlayWindow.showInactive();
+    }
     currentOverlayWindow.moveTop();
     void captureSession.overlayReady.then(() => {
       if (currentOverlayWindow.isDestroyed()) {
@@ -586,7 +597,7 @@ ipcMain.handle('capture:save-rendered', async (_event, payload) => {
   return { ok: true, filePath: result.filePath };
 });
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   if (process.platform === 'darwin') {
     app.setActivationPolicy('accessory');
   }
@@ -595,6 +606,8 @@ app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
 
   createOverlayWindow();
+  await overlayWindowReady;
+  hideOverlayWindow();
   registerShortcut();
 });
 
