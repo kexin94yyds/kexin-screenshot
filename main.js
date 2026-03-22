@@ -1,6 +1,6 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
-const { execFile } = require('node:child_process');
+const { execFile, spawn } = require('node:child_process');
 const { pathToFileURL } = require('node:url');
 
 const {
@@ -30,6 +30,10 @@ let captureStarting = false;
 let shortcutRegistered = false;
 let captureWarmupTimer = null;
 let captureWarmupPromise = null;
+let nativeHelperServerProcess = null;
+let nativeHelperServerStdoutBuffer = '';
+let nativeHelperServerRequestId = 0;
+const nativeHelperServerPendingRequests = new Map();
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -76,7 +80,9 @@ async function warmCaptureBackend() {
 
     if (helperPath) {
       const warmupStartedAt = Date.now();
-      await execFileAsync(helperPath, ['--warmup']).catch(() => null);
+      await requestNativeHelperServer({ type: 'warmup' }, 4000).catch(() => {
+        return execFileAsync(helperPath, ['--warmup']).catch(() => null);
+      });
       console.log(`[${APP_NAME}] native capture warmup`, {
         elapsedMs: Date.now() - warmupStartedAt,
       });
@@ -161,6 +167,15 @@ function execFileAsync(file, args) {
   });
 }
 
+function rejectPendingNativeHelperRequests(error) {
+  for (const pending of nativeHelperServerPendingRequests.values()) {
+    clearTimeout(pending.timeout);
+    pending.reject(error);
+  }
+
+  nativeHelperServerPendingRequests.clear();
+}
+
 function getNativeCaptureHelperPath() {
   const candidatePaths = [
     path.join(process.resourcesPath, 'native', 'QQShotCaptureCLI'),
@@ -176,6 +191,119 @@ function getNativeCaptureHelperPath() {
   }) ?? null;
 }
 
+function teardownNativeHelperServer(error = new Error('Native helper server stopped.')) {
+  if (nativeHelperServerProcess) {
+    nativeHelperServerProcess.removeAllListeners();
+    nativeHelperServerProcess.stdout?.removeAllListeners();
+    nativeHelperServerProcess.stderr?.removeAllListeners();
+  }
+
+  rejectPendingNativeHelperRequests(error);
+  nativeHelperServerProcess = null;
+  nativeHelperServerStdoutBuffer = '';
+}
+
+function handleNativeHelperServerStdout(chunk) {
+  nativeHelperServerStdoutBuffer += chunk.toString();
+  const lines = nativeHelperServerStdoutBuffer.split('\n');
+  nativeHelperServerStdoutBuffer = lines.pop() ?? '';
+
+  for (const line of lines) {
+    if (!line.trim()) {
+      continue;
+    }
+
+    let response = null;
+    try {
+      response = JSON.parse(line);
+    } catch {
+      continue;
+    }
+
+    const pending = nativeHelperServerPendingRequests.get(response.id);
+    if (!pending) {
+      continue;
+    }
+
+    clearTimeout(pending.timeout);
+    nativeHelperServerPendingRequests.delete(response.id);
+
+    if (response.ok) {
+      pending.resolve(response);
+      continue;
+    }
+
+    pending.reject(new Error(response.error ?? 'Native helper request failed.'));
+  }
+}
+
+function ensureNativeHelperServer() {
+  if (process.platform !== 'darwin') {
+    return null;
+  }
+
+  if (nativeHelperServerProcess && !nativeHelperServerProcess.killed) {
+    return nativeHelperServerProcess;
+  }
+
+  const helperPath = getNativeCaptureHelperPath();
+  if (!helperPath) {
+    return null;
+  }
+
+  const helperProcess = spawn(helperPath, ['--server'], {
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+
+  helperProcess.stdout.on('data', handleNativeHelperServerStdout);
+  helperProcess.stderr.on('data', (chunk) => {
+    const message = chunk.toString().trim();
+    if (message) {
+      console.warn(`[${APP_NAME}] native helper stderr`, message);
+    }
+  });
+  helperProcess.on('exit', (code, signal) => {
+    teardownNativeHelperServer(
+      new Error(`Native helper server exited (code=${code ?? 'null'}, signal=${signal ?? 'null'}).`)
+    );
+  });
+  helperProcess.on('error', (error) => {
+    teardownNativeHelperServer(error);
+  });
+
+  nativeHelperServerProcess = helperProcess;
+  nativeHelperServerStdoutBuffer = '';
+  return nativeHelperServerProcess;
+}
+
+function requestNativeHelperServer(command, timeoutMs = 5000) {
+  const helperProcess = ensureNativeHelperServer();
+  if (!helperProcess) {
+    return Promise.reject(new Error('Native helper server is unavailable.'));
+  }
+
+  const id = String(++nativeHelperServerRequestId);
+
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      nativeHelperServerPendingRequests.delete(id);
+      reject(new Error(`Native helper request timed out: ${command.type}`));
+    }, timeoutMs);
+
+    nativeHelperServerPendingRequests.set(id, { resolve, reject, timeout });
+
+    helperProcess.stdin.write(`${JSON.stringify({ id, ...command })}\n`, (error) => {
+      if (!error) {
+        return;
+      }
+
+      clearTimeout(timeout);
+      nativeHelperServerPendingRequests.delete(id);
+      reject(error);
+    });
+  });
+}
+
 async function captureDisplayImageWithNativeHelper() {
   if (process.platform !== 'darwin') {
     return null;
@@ -188,7 +316,10 @@ async function captureDisplayImageWithNativeHelper() {
 
   const captureStartedAt = Date.now();
   const tempFilePath = path.join(app.getPath('temp'), `qq-shot-native-${Date.now()}.png`);
-  await execFileAsync(helperPath, ['--output', tempFilePath]);
+  await requestNativeHelperServer(
+    { type: 'capture', outputPath: tempFilePath },
+    6000
+  ).catch(() => execFileAsync(helperPath, ['--output', tempFilePath]));
 
   const image = nativeImage.createFromPath(tempFilePath);
   if (image.isEmpty()) {
@@ -741,4 +872,7 @@ app.on('window-all-closed', () => {
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
+  if (nativeHelperServerProcess && !nativeHelperServerProcess.killed) {
+    nativeHelperServerProcess.kill();
+  }
 });
