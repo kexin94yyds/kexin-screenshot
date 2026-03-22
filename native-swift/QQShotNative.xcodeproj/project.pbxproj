@@ -8,23 +8,34 @@
 
 /* Begin PBXBuildFile section */
 		061628E0638E46325E2C694F /* ScreenCaptureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8264B4927FA29324B3082C8D /* ScreenCaptureKit.framework */; };
-		142B36D704AE53B11B1807A5 /* CapturePermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DF3A60B6AFC455D960865B8 /* CapturePermissions.swift */; };
+		09649F3D0E23395E9A560FF4 /* CapturePermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD538739F8F85B93B04CF9B /* CapturePermissions.swift */; };
+		138964C69843005C13E94D81 /* DisplayRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3DD901C56198F1D062B4AE8 /* DisplayRegistry.swift */; };
 		153B9C3F669CE2B005CC337A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34F9CBD48F456A11298681A3 /* AppDelegate.swift */; };
+		1655D927E4065B42D29A171A /* ScreenCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EACD178D4BBAEE6372399D /* ScreenCaptureService.swift */; };
+		22CACC92B6D6FC651389330A /* PNGFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC89C9B42EA6C2529984E14 /* PNGFileWriter.swift */; };
+		2E59F05815802724D209D083 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7750B2987E6777230361139F /* Models.swift */; };
+		3A005CD4098D27D95C8B2869 /* CapturePermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD538739F8F85B93B04CF9B /* CapturePermissions.swift */; };
 		3B540A89F3E2B8C5C7C10329 /* SelectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36A892D47683D5E69EADD2DF /* SelectionState.swift */; };
 		3E75805BB2408C6667781557 /* OverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BF2A9F2F3D9B67D15AB1433 /* OverlayView.swift */; };
+		4260E97965CCBD935C2BA8B2 /* ScreenCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EACD178D4BBAEE6372399D /* ScreenCaptureService.swift */; };
 		4605BF8DD907E975B88B706A /* SelectionRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0AA1952BF92CAFD4551694A /* SelectionRenderer.swift */; };
 		4667189B9F30FD9D7E0454E1 /* OverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0430FBE9892AC99DE9AAE39 /* OverlayWindow.swift */; };
+		468B665DFF810784119CF70D /* ImageCropper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D0F7DD71D4E1BC53EFC26F1 /* ImageCropper.swift */; };
 		4FD80FC294E62331372F7452 /* GlobalHotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7560B2696930FD76C6C466FF /* GlobalHotkeyManager.swift */; };
 		604BFBD385382346DBCC309F /* QQShotNativeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D70B47FE82402969D7F0257 /* QQShotNativeApp.swift */; };
-		604F2EE5DE4E9F5A03F7D03C /* ImageCropper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40C2FADE5F7E12DB472FE8DA /* ImageCropper.swift */; };
 		7760BE470A1D6DB8EBB64034 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED7EC35F1714F5BC58C7342 /* Logger.swift */; };
-		93E2E9E004EC5EC8CD095565 /* DisplayRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 084D60878BC1595FED4A89B1 /* DisplayRegistry.swift */; };
+		7D5F90E5952B0835AFD0157E /* FileSaver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F72D61CD35695EA722736128 /* FileSaver.swift */; };
+		8628392F2FBDE52A6CA15875 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCC68AB801BFF8C7936D5AB5 /* ImageIO.framework */; };
+		8E29C0A21C5F7E062B8D954F /* PNGFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC89C9B42EA6C2529984E14 /* PNGFileWriter.swift */; };
 		9A37563A3E4FEB64FA83A07F /* CaptureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10063C5F30984CB9A7CD8E2 /* CaptureTests.swift */; };
-		AC0B705602DE91E44881CB5A /* FileSaver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49063E920E8947A6290E2346 /* FileSaver.swift */; };
+		A88A60F5C2D71B8AFD494218 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F3286D26E5446A4F6582500E /* UniformTypeIdentifiers.framework */; };
+		AB6F023F2172F405B3C09517 /* ClipboardWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9642B7F96E4F761564834C4A /* ClipboardWriter.swift */; };
 		BD697B4510815D669C49ED58 /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95DBF760522A6F815151C3C4 /* AppConstants.swift */; };
 		BF210E9453AFA29093D3A5C4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9F92CBAC124F9BCE46123CC3 /* Assets.xcassets */; };
-		C26CA3CD4B7EAF06C09DB339 /* ClipboardWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F2A8748C0FCFFA0A711A31 /* ClipboardWriter.swift */; };
-		CDAF40FD2B6590835021564D /* ScreenCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55DF81E175B01536AF09B94 /* ScreenCaptureService.swift */; };
+		C2E2D92E87A53B23F31EFB2F /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A550C7576D98942D9166E4E /* AppKit.framework */; };
+		D445C06CD2CF285CC90C2D1B /* ScreenCaptureKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8264B4927FA29324B3082C8D /* ScreenCaptureKit.framework */; };
+		E072A95831D83AFA37ABEA07 /* DisplayRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3DD901C56198F1D062B4AE8 /* DisplayRegistry.swift */; };
+		E1B2939D4755277F034466CB /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = F38A5FB4275BDD7A83FE2E46 /* main.swift */; };
 		E90D39C7578DD957002731E9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D4ACD63848D1EB7513A1A6A /* Carbon.framework */; };
 		EFDB370627BB98F053E73789 /* GeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C856E4E8C96345AF6871FB4 /* GeometryTests.swift */; };
 		F447DC05FB4295AC863F5F3D /* SceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D772A6DCA8827CD65657AB4A /* SceneController.swift */; };
@@ -42,33 +53,50 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		084D60878BC1595FED4A89B1 /* DisplayRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayRegistry.swift; sourceTree = "<group>"; };
+		0AC89C9B42EA6C2529984E14 /* PNGFileWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PNGFileWriter.swift; sourceTree = "<group>"; };
 		2C856E4E8C96345AF6871FB4 /* GeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryTests.swift; sourceTree = "<group>"; };
 		34F9CBD48F456A11298681A3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		36A892D47683D5E69EADD2DF /* SelectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionState.swift; sourceTree = "<group>"; };
-		40C2FADE5F7E12DB472FE8DA /* ImageCropper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCropper.swift; sourceTree = "<group>"; };
-		49063E920E8947A6290E2346 /* FileSaver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSaver.swift; sourceTree = "<group>"; };
+		4A550C7576D98942D9166E4E /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		4D0F7DD71D4E1BC53EFC26F1 /* ImageCropper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCropper.swift; sourceTree = "<group>"; };
 		4D70B47FE82402969D7F0257 /* QQShotNativeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QQShotNativeApp.swift; sourceTree = "<group>"; };
-		5DF3A60B6AFC455D960865B8 /* CapturePermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturePermissions.swift; sourceTree = "<group>"; };
 		6D4ACD63848D1EB7513A1A6A /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		7560B2696930FD76C6C466FF /* GlobalHotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalHotkeyManager.swift; sourceTree = "<group>"; };
 		7750B2987E6777230361139F /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		8264B4927FA29324B3082C8D /* ScreenCaptureKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScreenCaptureKit.framework; path = System/Library/Frameworks/ScreenCaptureKit.framework; sourceTree = SDKROOT; };
 		8BF2A9F2F3D9B67D15AB1433 /* OverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayView.swift; sourceTree = "<group>"; };
-		93F2A8748C0FCFFA0A711A31 /* ClipboardWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardWriter.swift; sourceTree = "<group>"; };
 		95DBF760522A6F815151C3C4 /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
+		9642B7F96E4F761564834C4A /* ClipboardWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardWriter.swift; sourceTree = "<group>"; };
 		9C7AEDF3F5DE42CB2FBC0D87 /* QQShotNativeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QQShotNativeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F92CBAC124F9BCE46123CC3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A3DD901C56198F1D062B4AE8 /* DisplayRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayRegistry.swift; sourceTree = "<group>"; };
 		AAFA01BCC1C5B5C251F78B69 /* QQShotNative.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QQShotNative.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		B55DF81E175B01536AF09B94 /* ScreenCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCaptureService.swift; sourceTree = "<group>"; };
+		C7EACD178D4BBAEE6372399D /* ScreenCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCaptureService.swift; sourceTree = "<group>"; };
+		CFD538739F8F85B93B04CF9B /* CapturePermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturePermissions.swift; sourceTree = "<group>"; };
 		D772A6DCA8827CD65657AB4A /* SceneController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneController.swift; sourceTree = "<group>"; };
+		DCC68AB801BFF8C7936D5AB5 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		E0430FBE9892AC99DE9AAE39 /* OverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindow.swift; sourceTree = "<group>"; };
 		F0AA1952BF92CAFD4551694A /* SelectionRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionRenderer.swift; sourceTree = "<group>"; };
 		F10063C5F30984CB9A7CD8E2 /* CaptureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureTests.swift; sourceTree = "<group>"; };
+		F3286D26E5446A4F6582500E /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
+		F38A5FB4275BDD7A83FE2E46 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		F72D61CD35695EA722736128 /* FileSaver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSaver.swift; sourceTree = "<group>"; };
 		FED7EC35F1714F5BC58C7342 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		FF8FDE71395FC0A2DC693D76 /* QQShotCaptureCLI */ = {isa = PBXFileReference; includeInIndex = 0; path = QQShotCaptureCLI; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		DC2F358ECFAE9D72755550E4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D445C06CD2CF285CC90C2D1B /* ScreenCaptureKit.framework in Frameworks */,
+				C2E2D92E87A53B23F31EFB2F /* AppKit.framework in Frameworks */,
+				8628392F2FBDE52A6CA15875 /* ImageIO.framework in Frameworks */,
+				A88A60F5C2D71B8AFD494218 /* UniformTypeIdentifiers.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DC6F832AF47A1D2696DF1B12 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -103,7 +131,11 @@
 		4F88803B0087104D2057030A = {
 			isa = PBXGroup;
 			children = (
+				FE74B9FAA899FD0211A374BE /* Actions */,
+				704F9904424F4CCD3B532C04 /* Capture */,
+				F98B496D26AF328A9E742E22 /* QQShotCaptureCLI */,
 				5213BD556D47C5084484E714 /* QQShotNative */,
+				850B4C7F4E5AE532DBD2E62A /* Shared */,
 				D0D905D45D6E767EAC57CD74 /* Tests */,
 				B1257B8139434767DB96B41C /* Frameworks */,
 				A2C2CC7FB32CAB72736AEAB6 /* Products */,
@@ -113,9 +145,9 @@
 		5213BD556D47C5084484E714 /* QQShotNative */ = {
 			isa = PBXGroup;
 			children = (
-				BB28893D26A0926F983EF473 /* Actions */,
+				FE74B9FAA899FD0211A374BE /* Actions */,
 				BC061685EB972576BE79717D /* App */,
-				7565365A25AA72667B15E165 /* Capture */,
+				704F9904424F4CCD3B532C04 /* Capture */,
 				324244FEF9B23A3069963744 /* Hotkey */,
 				0F93BB35E46CB729A2F5E442 /* Overlay */,
 				899BAF42184FE3461BDDE3EF /* Resources */,
@@ -124,14 +156,15 @@
 			path = QQShotNative;
 			sourceTree = "<group>";
 		};
-		7565365A25AA72667B15E165 /* Capture */ = {
+		704F9904424F4CCD3B532C04 /* Capture */ = {
 			isa = PBXGroup;
 			children = (
-				5DF3A60B6AFC455D960865B8 /* CapturePermissions.swift */,
-				084D60878BC1595FED4A89B1 /* DisplayRegistry.swift */,
-				B55DF81E175B01536AF09B94 /* ScreenCaptureService.swift */,
+				CFD538739F8F85B93B04CF9B /* CapturePermissions.swift */,
+				A3DD901C56198F1D062B4AE8 /* DisplayRegistry.swift */,
+				C7EACD178D4BBAEE6372399D /* ScreenCaptureService.swift */,
 			);
-			path = Capture;
+			name = Capture;
+			path = QQShotNative/Capture;
 			sourceTree = "<group>";
 		};
 		850B4C7F4E5AE532DBD2E62A /* Shared */ = {
@@ -141,7 +174,8 @@
 				FED7EC35F1714F5BC58C7342 /* Logger.swift */,
 				7750B2987E6777230361139F /* Models.swift */,
 			);
-			path = Shared;
+			name = Shared;
+			path = QQShotNative/Shared;
 			sourceTree = "<group>";
 		};
 		899BAF42184FE3461BDDE3EF /* Resources */ = {
@@ -163,6 +197,7 @@
 		A2C2CC7FB32CAB72736AEAB6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				FF8FDE71395FC0A2DC693D76 /* QQShotCaptureCLI */,
 				AAFA01BCC1C5B5C251F78B69 /* QQShotNative.app */,
 				9C7AEDF3F5DE42CB2FBC0D87 /* QQShotNativeTests.xctest */,
 			);
@@ -172,20 +207,13 @@
 		B1257B8139434767DB96B41C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4A550C7576D98942D9166E4E /* AppKit.framework */,
 				6D4ACD63848D1EB7513A1A6A /* Carbon.framework */,
+				DCC68AB801BFF8C7936D5AB5 /* ImageIO.framework */,
 				8264B4927FA29324B3082C8D /* ScreenCaptureKit.framework */,
+				F3286D26E5446A4F6582500E /* UniformTypeIdentifiers.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		BB28893D26A0926F983EF473 /* Actions */ = {
-			isa = PBXGroup;
-			children = (
-				93F2A8748C0FCFFA0A711A31 /* ClipboardWriter.swift */,
-				49063E920E8947A6290E2346 /* FileSaver.swift */,
-				40C2FADE5F7E12DB472FE8DA /* ImageCropper.swift */,
-			);
-			path = Actions;
 			sourceTree = "<group>";
 		};
 		BC061685EB972576BE79717D /* App */ = {
@@ -207,12 +235,32 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		F98B496D26AF328A9E742E22 /* QQShotCaptureCLI */ = {
+			isa = PBXGroup;
+			children = (
+				F38A5FB4275BDD7A83FE2E46 /* main.swift */,
+			);
+			path = QQShotCaptureCLI;
+			sourceTree = "<group>";
+		};
 		FA22F41B12C17A161CACC32A /* GeometryTests */ = {
 			isa = PBXGroup;
 			children = (
 				2C856E4E8C96345AF6871FB4 /* GeometryTests.swift */,
 			);
 			path = GeometryTests;
+			sourceTree = "<group>";
+		};
+		FE74B9FAA899FD0211A374BE /* Actions */ = {
+			isa = PBXGroup;
+			children = (
+				9642B7F96E4F761564834C4A /* ClipboardWriter.swift */,
+				F72D61CD35695EA722736128 /* FileSaver.swift */,
+				4D0F7DD71D4E1BC53EFC26F1 /* ImageCropper.swift */,
+				0AC89C9B42EA6C2529984E14 /* PNGFileWriter.swift */,
+			);
+			name = Actions;
+			path = QQShotNative/Actions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -255,6 +303,24 @@
 			productReference = 9C7AEDF3F5DE42CB2FBC0D87 /* QQShotNativeTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		755A3D8B358997C96E44F564 /* QQShotCaptureCLI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5D30FA70AA5E2D89307A4FD9 /* Build configuration list for PBXNativeTarget "QQShotCaptureCLI" */;
+			buildPhases = (
+				BFF11BD8431CBCF62295466C /* Sources */,
+				DC2F358ECFAE9D72755550E4 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = QQShotCaptureCLI;
+			packageProductDependencies = (
+			);
+			productName = QQShotCaptureCLI;
+			productReference = FF8FDE71395FC0A2DC693D76 /* QQShotCaptureCLI */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -269,6 +335,10 @@
 						ProvisioningStyle = Automatic;
 					};
 					393F9588E980454A637796DF = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					755A3D8B358997C96E44F564 = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
@@ -288,6 +358,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				755A3D8B358997C96E44F564 /* QQShotCaptureCLI */,
 				2F0F7FB42D8AAC263D33CA9F /* QQShotNative */,
 				393F9588E980454A637796DF /* QQShotNativeTests */,
 			);
@@ -312,19 +383,20 @@
 			files = (
 				BD697B4510815D669C49ED58 /* AppConstants.swift in Sources */,
 				153B9C3F669CE2B005CC337A /* AppDelegate.swift in Sources */,
-				142B36D704AE53B11B1807A5 /* CapturePermissions.swift in Sources */,
-				C26CA3CD4B7EAF06C09DB339 /* ClipboardWriter.swift in Sources */,
-				93E2E9E004EC5EC8CD095565 /* DisplayRegistry.swift in Sources */,
-				AC0B705602DE91E44881CB5A /* FileSaver.swift in Sources */,
+				09649F3D0E23395E9A560FF4 /* CapturePermissions.swift in Sources */,
+				AB6F023F2172F405B3C09517 /* ClipboardWriter.swift in Sources */,
+				E072A95831D83AFA37ABEA07 /* DisplayRegistry.swift in Sources */,
+				7D5F90E5952B0835AFD0157E /* FileSaver.swift in Sources */,
 				4FD80FC294E62331372F7452 /* GlobalHotkeyManager.swift in Sources */,
-				604F2EE5DE4E9F5A03F7D03C /* ImageCropper.swift in Sources */,
+				468B665DFF810784119CF70D /* ImageCropper.swift in Sources */,
 				7760BE470A1D6DB8EBB64034 /* Logger.swift in Sources */,
 				F945C36AF77F1BA724C634B2 /* Models.swift in Sources */,
 				3E75805BB2408C6667781557 /* OverlayView.swift in Sources */,
 				4667189B9F30FD9D7E0454E1 /* OverlayWindow.swift in Sources */,
+				22CACC92B6D6FC651389330A /* PNGFileWriter.swift in Sources */,
 				604BFBD385382346DBCC309F /* QQShotNativeApp.swift in Sources */,
 				F447DC05FB4295AC863F5F3D /* SceneController.swift in Sources */,
-				CDAF40FD2B6590835021564D /* ScreenCaptureService.swift in Sources */,
+				1655D927E4065B42D29A171A /* ScreenCaptureService.swift in Sources */,
 				4605BF8DD907E975B88B706A /* SelectionRenderer.swift in Sources */,
 				3B540A89F3E2B8C5C7C10329 /* SelectionState.swift in Sources */,
 			);
@@ -336,6 +408,19 @@
 			files = (
 				9A37563A3E4FEB64FA83A07F /* CaptureTests.swift in Sources */,
 				EFDB370627BB98F053E73789 /* GeometryTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BFF11BD8431CBCF62295466C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3A005CD4098D27D95C8B2869 /* CapturePermissions.swift in Sources */,
+				138964C69843005C13E94D81 /* DisplayRegistry.swift in Sources */,
+				2E59F05815802724D209D083 /* Models.swift in Sources */,
+				8E29C0A21C5F7E062B8D954F /* PNGFileWriter.swift in Sources */,
+				4260E97965CCBD935C2BA8B2 /* ScreenCaptureService.swift in Sources */,
+				E1B2939D4755277F034466CB /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -511,6 +596,38 @@
 			};
 			name = Debug;
 		};
+		4CD4F88E00E73F962656271A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kexin.qqshotcapturecli;
+				PRODUCT_MODULE_NAME = QQShotCaptureCLI;
+				PRODUCT_NAME = QQShotCaptureCLI;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		941B19AFE69853E848641F4F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kexin.qqshotcapturecli;
+				PRODUCT_MODULE_NAME = QQShotCaptureCLI;
+				PRODUCT_NAME = QQShotCaptureCLI;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
 		CCD5B81A7AD68266879EAC7E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -552,6 +669,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		5D30FA70AA5E2D89307A4FD9 /* Build configuration list for PBXNativeTarget "QQShotCaptureCLI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				941B19AFE69853E848641F4F /* Debug */,
+				4CD4F88E00E73F962656271A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		68E49576889289D46D965A7F /* Build configuration list for PBXNativeTarget "QQShotNative" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

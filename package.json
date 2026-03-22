@@ -8,7 +8,8 @@
   "scripts": {
     "start": "electron .",
     "dev": "electron .",
-    "dist:mac": "electron-builder --mac dir"
+    "build:native-helper": "cd native-swift && xcodegen generate && xcodebuild -project QQShotNative.xcodeproj -scheme QQShotCaptureCLI -configuration Debug CONFIGURATION_BUILD_DIR=\"$PWD/local-build\" build",
+    "dist:mac": "npm run build:native-helper && electron-builder --mac dir"
   },
   "build": {
     "appId": "com.apple.qq-shot",
@@ -16,6 +17,12 @@
     "directories": {
       "output": "dist"
     },
+    "extraResources": [
+      {
+        "from": "native-swift/local-build/QQShotCaptureCLI",
+        "to": "native/QQShotCaptureCLI"
+      }
+    ],
     "files": [
       "main.js",
       "preload.js",

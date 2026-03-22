@@ -41,6 +41,28 @@ targets:
         CODE_SIGN_ENTITLEMENTS: QQShotNative/Resources/QQShot.entitlements
         LSApplicationCategoryType: public.app-category.utilities
 
+  QQShotCaptureCLI:
+    type: tool
+    platform: macOS
+    sources:
+      - path: QQShotCaptureCLI
+      - path: QQShotNative/Capture/CapturePermissions.swift
+      - path: QQShotNative/Capture/DisplayRegistry.swift
+      - path: QQShotNative/Capture/ScreenCaptureService.swift
+      - path: QQShotNative/Shared/Models.swift
+      - path: QQShotNative/Actions/PNGFileWriter.swift
+    dependencies:
+      - sdk: ScreenCaptureKit.framework
+      - sdk: AppKit.framework
+      - sdk: ImageIO.framework
+      - sdk: UniformTypeIdentifiers.framework
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kexin.qqshotcapturecli
+        PRODUCT_NAME: QQShotCaptureCLI
+        PRODUCT_MODULE_NAME: QQShotCaptureCLI
+        GENERATE_INFOPLIST_FILE: YES
+
   QQShotNativeTests:
     type: bundle.unit-test
     platform: macOS

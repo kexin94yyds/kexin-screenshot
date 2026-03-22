@@ -147,6 +147,48 @@ function execFileAsync(file, args) {
   });
 }
 
+function getNativeCaptureHelperPath() {
+  const candidatePaths = [
+    path.join(process.resourcesPath, 'native', 'QQShotCaptureCLI'),
+    path.join(__dirname, 'native-swift', 'local-build', 'QQShotCaptureCLI'),
+  ];
+
+  return candidatePaths.find((candidate) => {
+    try {
+      return require('node:fs').existsSync(candidate);
+    } catch {
+      return false;
+    }
+  }) ?? null;
+}
+
+async function captureDisplayImageWithNativeHelper() {
+  if (process.platform !== 'darwin') {
+    return null;
+  }
+
+  const helperPath = getNativeCaptureHelperPath();
+  if (!helperPath) {
+    return null;
+  }
+
+  const tempFilePath = path.join(app.getPath('temp'), `qq-shot-native-${Date.now()}.png`);
+  await execFileAsync(helperPath, ['--output', tempFilePath]);
+
+  const image = nativeImage.createFromPath(tempFilePath);
+  if (image.isEmpty()) {
+    throw new Error('Native helper returned an empty image.');
+  }
+
+  return {
+    image,
+    previewSrc: pathToFileURL(tempFilePath).href,
+    sourceSize: image.getSize(),
+    tempFilePath,
+    captureBackend: 'screenCaptureKit',
+  };
+}
+
 function getMacCaptureDisplayIndex(display) {
   const primaryDisplayId = screen.getPrimaryDisplay().id;
   const orderedDisplays = [...screen.getAllDisplays()].sort((left, right) => {
@@ -170,15 +212,13 @@ function getMacCaptureDisplayIndex(display) {
 }
 
 async function captureDisplayImage(display) {
-  const source = await getDisplaySourceWithRetry(display);
-  if (source?.thumbnail && !source.thumbnail.isEmpty()) {
-    return {
-      image: source.thumbnail,
-      previewSrc: source.thumbnail.toDataURL(),
-      sourceSize: source.thumbnail.getSize(),
-      tempFilePath: null,
-      captureBackend: 'desktopCapturer',
-    };
+  const nativeCapture = await captureDisplayImageWithNativeHelper().catch((error) => {
+    console.warn(`[${APP_NAME}] Native capture failed, falling back`, error);
+    return null;
+  });
+
+  if (nativeCapture) {
+    return nativeCapture;
   }
 
   if (process.platform === 'darwin') {
@@ -192,14 +232,26 @@ async function captureDisplayImage(display) {
       tempFilePath,
     ]);
 
+    const image = nativeImage.createFromPath(tempFilePath);
+    if (!image.isEmpty()) {
+      return {
+        image,
+        previewSrc: pathToFileURL(tempFilePath).href,
+        sourceSize: image.getSize(),
+        tempFilePath,
+        captureBackend: 'screencapture',
+      };
+    }
+  }
+
+  const source = await getDisplaySourceWithRetry(display);
+  if (source?.thumbnail && !source.thumbnail.isEmpty()) {
     return {
-      previewSrc: pathToFileURL(tempFilePath).href,
-      sourceSize: {
-        width: Math.round(display.bounds.width * display.scaleFactor),
-        height: Math.round(display.bounds.height * display.scaleFactor),
-      },
-      tempFilePath,
-      captureBackend: 'screencapture',
+      image: source.thumbnail,
+      previewSrc: source.thumbnail.toDataURL(),
+      sourceSize: source.thumbnail.getSize(),
+      tempFilePath: null,
+      captureBackend: 'desktopCapturer',
     };
   }
 
