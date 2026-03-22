@@ -2,7 +2,8 @@
 
 一个最小可用的桌面截屏工具，目标是接近 QQ 内置截图体验，但只保留截图能力：
 
-- 全局快捷键 `CommandOrControl+K`
+- 选区截图快捷键 `CommandOrControl+K`
+- 整屏直接复制快捷键 `CommandOrControl+Shift+K`
 - 优先截取鼠标所在的当前屏幕
 - 全屏截图覆盖层
 - 鼠标拖拽选区

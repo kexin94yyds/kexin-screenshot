@@ -19,7 +19,8 @@ const {
 } = require('electron');
 
 const APP_NAME = '可鑫的截屏小工具';
-const SHORTCUT = 'CommandOrControl+K';
+const SELECTION_SHORTCUT = 'CommandOrControl+K';
+const FULLSCREEN_CLIPBOARD_SHORTCUT = 'CommandOrControl+Shift+K';
 const SCREEN_SETTINGS_URL =
   'x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture';
 
@@ -59,7 +60,8 @@ function getScreenPermissionStatus() {
 function getAppStatus() {
   return {
     appName: APP_NAME,
-    shortcut: SHORTCUT,
+    shortcut: SELECTION_SHORTCUT,
+    fullscreenShortcut: FULLSCREEN_CLIPBOARD_SHORTCUT,
     shortcutRegistered,
     screenPermission: getScreenPermissionStatus(),
     captureInProgress: Boolean(captureSession || captureStarting),
@@ -114,12 +116,22 @@ function scheduleCaptureWarmup(delayMs = 0) {
 }
 
 function registerShortcut() {
-  shortcutRegistered = globalShortcut.register(SHORTCUT, () => {
+  const selectionRegistered = globalShortcut.register(SELECTION_SHORTCUT, () => {
     void startCapture();
   });
+  const fullscreenRegistered = globalShortcut.register(FULLSCREEN_CLIPBOARD_SHORTCUT, () => {
+    void copyCurrentDisplayToClipboard();
+  });
+  shortcutRegistered = selectionRegistered && fullscreenRegistered;
 
-  if (!shortcutRegistered) {
-    console.warn(`[${APP_NAME}] Failed to register shortcut ${SHORTCUT}`);
+  if (!selectionRegistered) {
+    console.warn(`[${APP_NAME}] Failed to register shortcut ${SELECTION_SHORTCUT}`);
+  }
+
+  if (!fullscreenRegistered) {
+    console.warn(
+      `[${APP_NAME}] Failed to register shortcut ${FULLSCREEN_CLIPBOARD_SHORTCUT}`
+    );
   }
 }
 
@@ -625,6 +637,54 @@ async function startCapture() {
     return { ok: false, reason: 'capture-failed' };
   } finally {
     captureStarting = false;
+  }
+}
+
+async function copyCurrentDisplayToClipboard() {
+  if (captureSession || captureStarting) {
+    return { ok: false, reason: 'capture-in-progress' };
+  }
+
+  captureStarting = true;
+  let tempFilePath = null;
+
+  try {
+    const permission = getScreenPermissionStatus();
+    if (permission === 'denied' || permission === 'restricted') {
+      await showPermissionDialog();
+      return { ok: false, reason: 'screen-permission-denied' };
+    }
+
+    const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+    const capture = await captureDisplayImage(display);
+    const image = capture.image ?? (
+      capture.tempFilePath ? nativeImage.createFromPath(capture.tempFilePath) : null
+    );
+
+    if (!image || image.isEmpty()) {
+      throw new Error('Failed to load the fullscreen capture image.');
+    }
+
+    tempFilePath = capture.tempFilePath ?? null;
+    clipboard.writeImage(image);
+    console.log(`[${APP_NAME}] fullscreen capture copied`, {
+      captureBackend: capture.captureBackend,
+      captureElapsedMs: capture.elapsedMs ?? null,
+      displayBounds: display.bounds,
+      sourceSize: capture.sourceSize,
+    });
+
+    return { ok: true };
+  } catch (error) {
+    console.error(`[${APP_NAME}] Failed to copy fullscreen capture`, error);
+    await showPermissionDialog();
+    return { ok: false, reason: 'capture-failed' };
+  } finally {
+    captureStarting = false;
+
+    if (tempFilePath) {
+      void fs.unlink(tempFilePath).catch(() => {});
+    }
   }
 }
 

@@ -1,7 +1,8 @@
 const startButton = document.getElementById('startButton');
 const settingsButton = document.getElementById('settingsButton');
 const permissionNode = document.getElementById('permission');
-const shortcutNode = document.getElementById('shortcut');
+const selectionShortcutNode = document.getElementById('selectionShortcut');
+const fullscreenShortcutNode = document.getElementById('fullscreenShortcut');
 
 function formatShortcut(shortcut) {
   const isMac = navigator.platform.toLowerCase().includes('mac');
@@ -16,7 +17,8 @@ function formatShortcut(shortcut) {
 }
 
 function renderStatus(status) {
-  shortcutNode.textContent = formatShortcut(status.shortcut);
+  selectionShortcutNode.textContent = formatShortcut(status.shortcut);
+  fullscreenShortcutNode.textContent = formatShortcut(status.fullscreenShortcut);
 
   permissionNode.className = 'status-pill';
 
