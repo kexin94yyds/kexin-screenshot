@@ -1,17 +1,29 @@
 import Foundation
 
 let arguments = Array(CommandLine.arguments.dropFirst())
+let shouldWarmupOnly = arguments.contains("--warmup")
 
-guard let outputPath = parseOutputPath(from: arguments) else {
+guard shouldWarmupOnly || parseOutputPath(from: arguments) != nil else {
   fputs("Missing required --output <path> argument.\n", stderr)
   exit(64)
 }
 
-let outputURL = URL(fileURLWithPath: outputPath)
-let outputDirectory = outputURL.deletingLastPathComponent()
+let outputPath = parseOutputPath(from: arguments)
+let outputURL = outputPath.map(URL.init(fileURLWithPath:))
+let outputDirectory = outputURL?.deletingLastPathComponent()
 
 Task {
   do {
+    if shouldWarmupOnly {
+      try await warmupCurrentDisplayCapture()
+      exit(0)
+    }
+
+    guard let outputURL, let outputDirectory else {
+      fputs("Missing required --output <path> argument.\n", stderr)
+      exit(64)
+    }
+
     try FileManager.default.createDirectory(
       at: outputDirectory,
       withIntermediateDirectories: true
@@ -55,4 +67,9 @@ private func parseOutputPath(from arguments: [String]) -> String? {
 @MainActor
 private func captureCurrentDisplay() async throws -> CapturedFrame {
   try await ScreenCaptureService().captureCurrentDisplay()
+}
+
+@MainActor
+private func warmupCurrentDisplayCapture() async throws {
+  try await ScreenCaptureService().warmupCurrentDisplayCapture()
 }

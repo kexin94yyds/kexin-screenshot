@@ -71,16 +71,30 @@ async function warmCaptureBackend() {
     return null;
   }
 
-  captureWarmupPromise = desktopCapturer
-    .getSources({
-      types: ['screen'],
-      thumbnailSize: { width: 1, height: 1 },
-      fetchWindowIcons: false,
-    })
-    .catch(() => null)
-    .finally(() => {
-      captureWarmupPromise = null;
-    });
+  captureWarmupPromise = (async () => {
+    const helperPath = getNativeCaptureHelperPath();
+
+    if (helperPath) {
+      const warmupStartedAt = Date.now();
+      await execFileAsync(helperPath, ['--warmup']).catch(() => null);
+      console.log(`[${APP_NAME}] native capture warmup`, {
+        elapsedMs: Date.now() - warmupStartedAt,
+      });
+      return true;
+    }
+
+    await desktopCapturer
+      .getSources({
+        types: ['screen'],
+        thumbnailSize: { width: 1, height: 1 },
+        fetchWindowIcons: false,
+      })
+      .catch(() => null);
+
+    return true;
+  })().finally(() => {
+    captureWarmupPromise = null;
+  });
 
   return captureWarmupPromise;
 }
@@ -172,6 +186,7 @@ async function captureDisplayImageWithNativeHelper() {
     return null;
   }
 
+  const captureStartedAt = Date.now();
   const tempFilePath = path.join(app.getPath('temp'), `qq-shot-native-${Date.now()}.png`);
   await execFileAsync(helperPath, ['--output', tempFilePath]);
 
@@ -186,6 +201,7 @@ async function captureDisplayImageWithNativeHelper() {
     sourceSize: image.getSize(),
     tempFilePath,
     captureBackend: 'screenCaptureKit',
+    elapsedMs: Date.now() - captureStartedAt,
   };
 }
 
@@ -403,6 +419,7 @@ async function startCapture() {
 
     console.log(`[${APP_NAME}] capture metrics`, {
       captureBackend: capture.captureBackend,
+      captureElapsedMs: capture.elapsedMs ?? null,
       displayBounds: display.bounds,
       scaleFactor: display.scaleFactor,
       expectedSize: {

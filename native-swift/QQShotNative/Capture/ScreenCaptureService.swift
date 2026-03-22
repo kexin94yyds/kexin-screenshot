@@ -19,7 +19,30 @@ final class ScreenCaptureService {
     displayRegistry.availableDisplays()
   }
 
+  func warmupCurrentDisplayCapture() async throws {
+    _ = try await resolveCurrentDisplayTarget()
+  }
+
   func captureCurrentDisplay() async throws -> CapturedFrame {
+    let (currentDisplay, targetDisplay) = try await resolveCurrentDisplayTarget()
+
+    let configuration = SCStreamConfiguration()
+    configuration.width = Int(currentDisplay.frame.width * currentDisplay.scaleFactor)
+    configuration.height = Int(currentDisplay.frame.height * currentDisplay.scaleFactor)
+
+    let image = try await SCScreenshotManager.captureImage(
+      contentFilter: SCContentFilter(
+        display: targetDisplay,
+        excludingApplications: [],
+        exceptingWindows: []
+      ),
+      configuration: configuration
+    )
+
+    return CapturedFrame(image: image, display: currentDisplay)
+  }
+
+  private func resolveCurrentDisplayTarget() async throws -> (DisplayDescriptor, SCDisplay) {
     guard permissionState() == .granted else {
       throw ScreenCaptureError.permissionDenied
     }
@@ -46,20 +69,6 @@ final class ScreenCaptureService {
       throw ScreenCaptureError.displayUnavailable
     }
 
-    let filter = SCContentFilter(
-      display: targetDisplay,
-      excludingApplications: [],
-      exceptingWindows: []
-    )
-    let configuration = SCStreamConfiguration()
-    configuration.width = Int(currentDisplay.frame.width * currentDisplay.scaleFactor)
-    configuration.height = Int(currentDisplay.frame.height * currentDisplay.scaleFactor)
-
-    let image = try await SCScreenshotManager.captureImage(
-      contentFilter: filter,
-      configuration: configuration
-    )
-
-    return CapturedFrame(image: image, display: currentDisplay)
+    return (currentDisplay, targetDisplay)
   }
 }
