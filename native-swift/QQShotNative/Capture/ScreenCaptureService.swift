@@ -10,6 +10,7 @@ enum ScreenCaptureError: Error {
 @MainActor
 final class ScreenCaptureService {
   private let displayRegistry = DisplayRegistry()
+  private var cachedDisplayTarget: (display: DisplayDescriptor, target: SCDisplay)?
 
   func permissionState() -> CapturePermissionState {
     CapturePermissions.currentState()
@@ -26,11 +27,30 @@ final class ScreenCaptureService {
   func captureCurrentDisplay() async throws -> CapturedFrame {
     let (currentDisplay, targetDisplay) = try await resolveCurrentDisplayTarget()
 
-    let configuration = SCStreamConfiguration()
-    configuration.width = Int(currentDisplay.frame.width * currentDisplay.scaleFactor)
-    configuration.height = Int(currentDisplay.frame.height * currentDisplay.scaleFactor)
+    do {
+      let image = try await captureImage(for: currentDisplay, targetDisplay: targetDisplay)
+      return CapturedFrame(image: image, display: currentDisplay)
+    } catch {
+      cachedDisplayTarget = nil
 
-    let image = try await SCScreenshotManager.captureImage(
+      let (refreshedDisplay, refreshedTargetDisplay) = try await resolveCurrentDisplayTarget()
+      let image = try await captureImage(
+        for: refreshedDisplay,
+        targetDisplay: refreshedTargetDisplay
+      )
+      return CapturedFrame(image: image, display: refreshedDisplay)
+    }
+  }
+
+  private func captureImage(
+    for display: DisplayDescriptor,
+    targetDisplay: SCDisplay
+  ) async throws -> CGImage {
+    let configuration = SCStreamConfiguration()
+    configuration.width = Int(display.frame.width * display.scaleFactor)
+    configuration.height = Int(display.frame.height * display.scaleFactor)
+
+    return try await SCScreenshotManager.captureImage(
       contentFilter: SCContentFilter(
         display: targetDisplay,
         excludingApplications: [],
@@ -38,8 +58,6 @@ final class ScreenCaptureService {
       ),
       configuration: configuration
     )
-
-    return CapturedFrame(image: image, display: currentDisplay)
   }
 
   private func resolveCurrentDisplayTarget() async throws -> (DisplayDescriptor, SCDisplay) {
@@ -53,6 +71,10 @@ final class ScreenCaptureService {
 
     guard let currentDisplay = displayRegistry.currentDisplay() else {
       throw ScreenCaptureError.displayUnavailable
+    }
+
+    if let cachedDisplayTarget, displayMatches(cachedDisplayTarget.display, currentDisplay) {
+      return (currentDisplay, cachedDisplayTarget.target)
     }
 
     let shareableContent = try await SCShareableContent.excludingDesktopWindows(
@@ -69,6 +91,16 @@ final class ScreenCaptureService {
       throw ScreenCaptureError.displayUnavailable
     }
 
+    cachedDisplayTarget = (display: currentDisplay, target: targetDisplay)
     return (currentDisplay, targetDisplay)
+  }
+
+  private func displayMatches(_ lhs: DisplayDescriptor, _ rhs: DisplayDescriptor) -> Bool {
+    lhs.id == rhs.id &&
+      abs(lhs.frame.origin.x - rhs.frame.origin.x) < 1 &&
+      abs(lhs.frame.origin.y - rhs.frame.origin.y) < 1 &&
+      abs(lhs.frame.width - rhs.frame.width) < 1 &&
+      abs(lhs.frame.height - rhs.frame.height) < 1 &&
+      abs(lhs.scaleFactor - rhs.scaleFactor) < 0.01
   }
 }
