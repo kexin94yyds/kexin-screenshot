@@ -23,6 +23,18 @@
 - `warmup`：约 `78.7ms`
 - 连续 3 次 `capture`：约 `165.8ms / 110.7ms / 116.0ms`
 
+### 真实 Electron 首开链路
+
+通过实际启动应用并触发 `Cmd+K`，抓到主链路日志：
+
+- 第一次 `capture startup timing`：`218ms`
+- 第二次 `capture startup timing`：`153ms`
+
+对应日志里的关键阶段：
+
+- 第一次 `captureElapsedMs`：`165ms`
+- 第二次 `captureElapsedMs`：`106ms`
+
 ## 结论
 
 1. `ScreenCaptureKit` 原生截图本体在预热后并不是最主要的瓶颈。
@@ -31,7 +43,8 @@
    - 主进程处理预览资源
    - renderer 解码预览图
    - overlay 等待首帧绘制完成
-3. 拖动流畅度问题主要集中在 overlay 层的同步重绘热区。
+3. 在当前这台机器上，真实主链路首开大约在 `218ms`，热路径约 `153ms`。
+4. 拖动流畅度问题主要集中在 overlay 层的同步重绘热区。
 
 ## 本轮保留的优化
 
@@ -86,3 +99,19 @@
    - overlay 可交互
 2. 若首开仍慢，继续压主进程与 renderer 之间的预览资源处理链路。
 3. 若用户主要感知在标注阶段，再继续细化马赛克重绘策略。
+
+## 本轮运行环境补充
+
+本机最开始无法直接 `npm start`，不是业务代码错误，而是运行环境缺少本地 Electron 二进制：
+
+- 项目根目录最初没有可用的 `node_modules/electron/dist/Electron.app`
+- `npm install` 走 `electron install.js` 时因下载超时失败
+
+最终采用的处理方式：
+
+1. 先执行 `npm install --ignore-scripts`
+2. 再手动下载 `electron-v40.8.0-darwin-arm64.zip`
+3. 解压到 `node_modules/electron/dist`
+4. 写入 `node_modules/electron/path.txt`
+
+这样后续 `npm start` 已可正常启动并产生日志。
