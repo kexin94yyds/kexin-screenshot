@@ -314,7 +314,10 @@ function showSelectionUi(rect) {
   toolbar.style.top = `${toolbarTop}px`;
   annotationLayer.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
   updateToolButtons();
-  renderAnnotations();
+
+  if (state.annotations.length > 0 || state.draftAnnotation) {
+    renderAnnotations();
+  }
 }
 
 function updateSelection(pointerX, pointerY) {
