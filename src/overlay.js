@@ -18,6 +18,10 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const ANNOTATION_COLOR = '#ff2f2f';
 const ANNOTATION_STROKE = 4;
 const MOSAIC_BLOCK_SIZE = 14;
+const mosaicContext = mosaicLayer.getContext('2d');
+const mosaicScratchCanvas = document.createElement('canvas');
+const mosaicScratchContext = mosaicScratchCanvas.getContext('2d');
+let annotationRenderFrame = 0;
 
 const state = {
   sessionId: null,
@@ -79,6 +83,26 @@ function normalizeRect(startX, startY, endX, endY) {
 
 function createSvgNode(tagName) {
   return document.createElementNS(SVG_NS, tagName);
+}
+
+function cancelScheduledAnnotationRender() {
+  if (!annotationRenderFrame) {
+    return;
+  }
+
+  cancelAnimationFrame(annotationRenderFrame);
+  annotationRenderFrame = 0;
+}
+
+function scheduleAnnotationRender() {
+  if (annotationRenderFrame) {
+    return;
+  }
+
+  annotationRenderFrame = requestAnimationFrame(() => {
+    annotationRenderFrame = 0;
+    renderAnnotations();
+  });
 }
 
 function updateToolButtons() {
@@ -143,13 +167,11 @@ function drawMosaicRegion(context, annotation, outputScale = 1) {
   const blockSize = Math.max(4, Math.round(MOSAIC_BLOCK_SIZE * outputScale));
   const sampleWidth = Math.max(1, Math.ceil(destinationWidth / blockSize));
   const sampleHeight = Math.max(1, Math.ceil(destinationHeight / blockSize));
-  const offscreenCanvas = document.createElement('canvas');
-  const offscreenContext = offscreenCanvas.getContext('2d');
 
-  offscreenCanvas.width = sampleWidth;
-  offscreenCanvas.height = sampleHeight;
-  offscreenContext.imageSmoothingEnabled = true;
-  offscreenContext.drawImage(
+  mosaicScratchCanvas.width = sampleWidth;
+  mosaicScratchCanvas.height = sampleHeight;
+  mosaicScratchContext.imageSmoothingEnabled = true;
+  mosaicScratchContext.drawImage(
     imageLayer,
     sourceX,
     sourceY,
@@ -164,7 +186,7 @@ function drawMosaicRegion(context, annotation, outputScale = 1) {
   context.save();
   context.imageSmoothingEnabled = false;
   context.drawImage(
-    offscreenCanvas,
+    mosaicScratchCanvas,
     0,
     0,
     sampleWidth,
@@ -180,10 +202,13 @@ function drawMosaicRegion(context, annotation, outputScale = 1) {
 function renderMosaics() {
   const width = Math.max(1, Math.round(state.selection?.width ?? 1));
   const height = Math.max(1, Math.round(state.selection?.height ?? 1));
-  const mosaicContext = mosaicLayer.getContext('2d');
 
-  mosaicLayer.width = width;
-  mosaicLayer.height = height;
+  if (mosaicLayer.width !== width) {
+    mosaicLayer.width = width;
+  }
+  if (mosaicLayer.height !== height) {
+    mosaicLayer.height = height;
+  }
   mosaicContext.clearRect(0, 0, width, height);
 
   if (!state.selection) {
@@ -204,6 +229,7 @@ function renderMosaics() {
 }
 
 function renderAnnotations() {
+  cancelScheduledAnnotationRender();
   renderMosaics();
   annotationLayer.replaceChildren();
 
@@ -539,7 +565,7 @@ window.addEventListener('mousemove', (event) => {
 
   if (state.drawingAnnotation) {
     state.draftAnnotation = createDraftAnnotation(pointerX, pointerY);
-    renderAnnotations();
+    scheduleAnnotationRender();
   }
 });
 
@@ -618,7 +644,7 @@ undoButton.addEventListener('click', (event) => {
   undoLastAnnotation();
 });
 
-  rectButton.addEventListener('click', (event) => {
+rectButton.addEventListener('click', (event) => {
   event.stopPropagation();
   setMode('rect');
 });
