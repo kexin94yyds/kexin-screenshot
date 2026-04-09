@@ -316,7 +316,14 @@ function requestNativeHelperServer(command, timeoutMs = 5000) {
   });
 }
 
-async function captureDisplayImageWithNativeHelper() {
+function getExpectedSourceSize(display) {
+  return {
+    width: Math.max(1, Math.round(display.bounds.width * display.scaleFactor)),
+    height: Math.max(1, Math.round(display.bounds.height * display.scaleFactor)),
+  };
+}
+
+async function captureDisplayImageWithNativeHelper(display) {
   if (process.platform !== 'darwin') {
     return null;
   }
@@ -333,15 +340,15 @@ async function captureDisplayImageWithNativeHelper() {
     6000
   ).catch(() => execFileAsync(helperPath, ['--output', tempFilePath]));
 
-  const image = nativeImage.createFromPath(tempFilePath);
-  if (image.isEmpty()) {
-    throw new Error('Native helper returned an empty image.');
+  const stats = await fs.stat(tempFilePath).catch(() => null);
+  if (!stats || stats.size === 0) {
+    throw new Error('Native helper returned an empty image file.');
   }
 
   return {
-    image,
+    image: null,
     previewSrc: pathToFileURL(tempFilePath).href,
-    sourceSize: image.getSize(),
+    sourceSize: getExpectedSourceSize(display),
     tempFilePath,
     captureBackend: 'screenCaptureKit',
     elapsedMs: Date.now() - captureStartedAt,
@@ -371,7 +378,7 @@ function getMacCaptureDisplayIndex(display) {
 }
 
 async function captureDisplayImage(display) {
-  const nativeCapture = await captureDisplayImageWithNativeHelper().catch((error) => {
+  const nativeCapture = await captureDisplayImageWithNativeHelper(display).catch((error) => {
     console.warn(`[${APP_NAME}] Native capture failed, falling back`, error);
     return null;
   });
@@ -391,12 +398,12 @@ async function captureDisplayImage(display) {
       tempFilePath,
     ]);
 
-    const image = nativeImage.createFromPath(tempFilePath);
-    if (!image.isEmpty()) {
+    const stats = await fs.stat(tempFilePath).catch(() => null);
+    if (stats && stats.size > 0) {
       return {
-        image,
+        image: null,
         previewSrc: pathToFileURL(tempFilePath).href,
-        sourceSize: image.getSize(),
+        sourceSize: getExpectedSourceSize(display),
         tempFilePath,
         captureBackend: 'screencapture',
       };
