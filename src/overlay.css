@@ -101,6 +101,18 @@ body {
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.24);
 }
 
+.selection.auto-snap {
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.24),
+    0 0 0 2px rgba(255, 122, 89, 0.95),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+}
+
+.selection.auto-snap .selection-border {
+  border-color: rgba(255, 122, 89, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
 .dimensions {
   position: absolute;
   padding: 6px 10px;
