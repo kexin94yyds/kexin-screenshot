@@ -118,6 +118,7 @@ private struct WindowSnapCandidate: Codable {
   let windowId: UInt32
   let ownerName: String
   let title: String
+  let layer: Int
   let x: Double
   let y: Double
   let width: Double
@@ -183,7 +184,7 @@ private func fetchWindowSnapCandidates() -> [WindowSnapCandidate] {
 
   return windows.compactMap { info -> WindowSnapCandidate? in
     let layer = info[kCGWindowLayer as String] as? Int ?? 0
-    guard layer == 0 else {
+    guard layer >= 0, layer <= 25 else {
       return nil
     }
 
@@ -213,6 +214,7 @@ private func fetchWindowSnapCandidates() -> [WindowSnapCandidate] {
       windowId: windowId,
       ownerName: ownerName,
       title: title,
+      layer: layer,
       x: Double(bounds.origin.x),
       y: Double(bounds.origin.y),
       width: Double(bounds.width),
