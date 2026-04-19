@@ -192,8 +192,8 @@ private func fetchWindowSnapCandidates() -> [WindowSnapCandidate] {
       return nil
     }
 
-    guard let boundsInfo = info[kCGWindowBounds as String] as? CFDictionary,
-      let bounds = CGRect(dictionaryRepresentation: boundsInfo)
+    guard let boundsInfo = info[kCGWindowBounds as String] as? [String: Any],
+      let bounds = CGRect(dictionaryRepresentation: boundsInfo as CFDictionary)
     else {
       return nil
     }
