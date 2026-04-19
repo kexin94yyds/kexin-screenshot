@@ -918,7 +918,13 @@ window.addEventListener('keydown', async (event) => {
     return;
   }
 
-  if (event.key === 'Enter' && state.selection) {
+  if (event.key === 'Enter' && state.previewSelection) {
+    event.preventDefault();
+    commitSnapPreview();
+    return;
+  }
+
+  if (event.key === 'Enter' && state.selectionConfirmed && state.selection) {
     event.preventDefault();
     await copySelection();
     return;
@@ -926,32 +932,32 @@ window.addEventListener('keydown', async (event) => {
 
   const lowerKey = event.key.toLowerCase();
   const isUndoShortcut = (event.metaKey || event.ctrlKey) && lowerKey === 'z';
-  if (isUndoShortcut && state.selection) {
+  if (isUndoShortcut && state.selectionConfirmed && state.selection) {
     event.preventDefault();
     undoLastAnnotation();
     return;
   }
 
-  if (lowerKey === 'r' && state.selection) {
+  if (lowerKey === 'r' && state.selectionConfirmed && state.selection) {
     event.preventDefault();
     setMode('rect');
     return;
   }
 
-  if (lowerKey === 'a' && state.selection) {
+  if (lowerKey === 'a' && state.selectionConfirmed && state.selection) {
     event.preventDefault();
     setMode('arrow');
     return;
   }
 
-  if (lowerKey === 'm' && state.selection) {
+  if (lowerKey === 'm' && state.selectionConfirmed && state.selection) {
     event.preventDefault();
     setMode('mosaic');
     return;
   }
 
   const isSaveShortcut = (event.metaKey || event.ctrlKey) && lowerKey === 's';
-  if (isSaveShortcut && state.selection) {
+  if (isSaveShortcut && state.selectionConfirmed && state.selection) {
     event.preventDefault();
     await saveSelection();
   }
