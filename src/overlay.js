@@ -594,7 +594,25 @@ function getWindowSnapCandidate(pointerX, pointerY) {
 }
 
 function getSnapCandidate(pointerX, pointerY) {
-  return getWindowSnapCandidate(pointerX, pointerY) ?? getVisualSnapCandidate(pointerX, pointerY);
+  const visualCandidate = getVisualSnapCandidate(pointerX, pointerY);
+  const windowCandidate = getWindowSnapCandidate(pointerX, pointerY);
+
+  if (!visualCandidate) {
+    return windowCandidate;
+  }
+
+  if (!windowCandidate) {
+    return visualCandidate;
+  }
+
+  const visualArea = visualCandidate.rect.width * visualCandidate.rect.height;
+  const windowArea = windowCandidate.rect.width * windowCandidate.rect.height;
+
+  if (visualArea >= windowArea * 0.08 && visualArea <= windowArea * 0.82) {
+    return visualCandidate;
+  }
+
+  return windowCandidate;
 }
 
 function updateSnapPreview(pointerX, pointerY) {
