@@ -512,19 +512,27 @@ function resetAnnotations() {
 
 function hideSelectionUi() {
   selection.classList.add('hidden');
+  selection.classList.remove('auto-snap');
   dimensions.classList.add('hidden');
   toolbar.classList.add('hidden');
   stage.classList.remove('has-selection');
   state.selection = null;
+  state.selectionConfirmed = false;
+  state.previewSelection = false;
+  state.pendingSnapCommit = false;
   resetAnnotations();
 }
 
-function showSelectionUi(rect) {
+function showSelectionUi(rect, options = {}) {
+  const isPreview = Boolean(options.preview);
   state.selection = rect;
+  state.selectionConfirmed = !isPreview;
+  state.previewSelection = isPreview;
 
   selection.classList.remove('hidden');
+  selection.classList.toggle('auto-snap', isPreview);
   dimensions.classList.remove('hidden');
-  toolbar.classList.remove('hidden');
+  toolbar.classList.toggle('hidden', isPreview);
   stage.classList.add('has-selection');
 
   selection.style.left = `${rect.x}px`;
@@ -535,7 +543,8 @@ function showSelectionUi(rect) {
   selectionImage.style.left = `${-rect.x}px`;
   selectionImage.style.top = `${-rect.y}px`;
 
-  dimensions.textContent = `${Math.round(rect.width)} × ${Math.round(rect.height)}`;
+  const sizeText = `${Math.round(rect.width)} × ${Math.round(rect.height)}`;
+  dimensions.textContent = isPreview ? `点击选中 · ${sizeText}` : sizeText;
   dimensions.style.left = `${rect.x}px`;
   dimensions.style.top = `${Math.max(12, rect.y - 38)}px`;
 
