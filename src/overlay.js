@@ -827,7 +827,16 @@ stage.addEventListener('mousedown', (event) => {
   state.anchorX = clamp(event.clientX, 0, window.innerWidth);
   state.anchorY = clamp(event.clientY, 0, window.innerHeight);
 
-  if (state.selection && isPointInsideSelection(state.anchorX, state.anchorY)) {
+  if (state.previewSelection && isPointInsideSelection(state.anchorX, state.anchorY)) {
+    state.pendingSnapCommit = true;
+    return;
+  }
+
+  if (
+    state.selectionConfirmed &&
+    state.selection &&
+    isPointInsideSelection(state.anchorX, state.anchorY)
+  ) {
     state.drawingAnnotation = true;
     state.draftAnnotation = createDraftAnnotation(state.anchorX, state.anchorY);
     renderAnnotations();
@@ -847,6 +856,21 @@ window.addEventListener('mousemove', (event) => {
   const pointerX = clamp(event.clientX, 0, window.innerWidth);
   const pointerY = clamp(event.clientY, 0, window.innerHeight);
 
+  if (state.pendingSnapCommit) {
+    const moved = Math.hypot(pointerX - state.anchorX, pointerY - state.anchorY);
+    if (moved < SNAP_DRAG_THRESHOLD) {
+      return;
+    }
+
+    state.pendingSnapCommit = false;
+    state.previewSelection = false;
+    state.selectionConfirmed = false;
+    state.drawingSelection = true;
+    resetAnnotations();
+    updateSelection(pointerX, pointerY);
+    return;
+  }
+
   if (state.drawingSelection) {
     updateSelection(pointerX, pointerY);
     return;
@@ -855,11 +879,20 @@ window.addEventListener('mousemove', (event) => {
   if (state.drawingAnnotation) {
     state.draftAnnotation = createDraftAnnotation(pointerX, pointerY);
     scheduleAnnotationRender();
+    return;
   }
+
+  updateSnapPreview(pointerX, pointerY);
 });
 
 window.addEventListener('mouseup', () => {
   if (!state.ready) {
+    return;
+  }
+
+  if (state.pendingSnapCommit) {
+    state.pendingSnapCommit = false;
+    commitSnapPreview();
     return;
   }
 
@@ -967,8 +1000,12 @@ window.qqShot.onCaptureData(async (payload) => {
   state.sessionId = payload.sessionId;
   state.ready = false;
   state.selection = null;
+  state.selectionConfirmed = false;
+  state.previewSelection = false;
   state.drawingSelection = false;
   state.drawingAnnotation = false;
+  state.pendingSnapCommit = false;
+  state.snapCandidates = normalizeSnapCandidates(payload.snapCandidates);
   hideSelectionUi();
   copyButton.disabled = false;
   saveButton.disabled = false;
@@ -979,6 +1016,7 @@ window.qqShot.onCaptureData(async (payload) => {
   imageLayer.src = payload.preview.src;
   selectionImage.src = payload.preview.src;
   await waitForImageLoad(imageLayer);
+  buildSnapAnalysis();
   await nextPaint();
   window.qqShot.reportOverlayMetrics({
     viewport: { width: window.innerWidth, height: window.innerHeight },
