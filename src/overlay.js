@@ -584,12 +584,50 @@ function isPointInsideSelection(pointX, pointY) {
     return false;
   }
 
-  return (
-    pointX >= state.selection.x &&
-    pointX <= state.selection.x + state.selection.width &&
-    pointY >= state.selection.y &&
-    pointY <= state.selection.y + state.selection.height
-  );
+  return pointInRect(pointX, pointY, state.selection);
+}
+
+function getWindowSnapCandidate(pointerX, pointerY) {
+  return state.snapCandidates.find((candidate) =>
+    pointInRect(pointerX, pointerY, candidate.rect)
+  ) ?? null;
+}
+
+function getSnapCandidate(pointerX, pointerY) {
+  return getWindowSnapCandidate(pointerX, pointerY) ?? getVisualSnapCandidate(pointerX, pointerY);
+}
+
+function updateSnapPreview(pointerX, pointerY) {
+  if (state.selectionConfirmed || state.drawingSelection || state.drawingAnnotation) {
+    return;
+  }
+
+  const candidate = getSnapCandidate(pointerX, pointerY);
+
+  if (!candidate) {
+    if (state.previewSelection) {
+      hideSelectionUi();
+    }
+    return;
+  }
+
+  if (state.previewSelection && sameRect(state.selection, candidate.rect)) {
+    return;
+  }
+
+  resetAnnotations();
+  showSelectionUi(candidate.rect, { preview: true, label: candidate.label });
+}
+
+function commitSnapPreview() {
+  if (!state.previewSelection || !state.selection) {
+    return false;
+  }
+
+  const rect = state.selection;
+  resetAnnotations();
+  showSelectionUi(rect, { preview: false });
+  return true;
 }
 
 function clampPointToSelection(pointX, pointY) {
