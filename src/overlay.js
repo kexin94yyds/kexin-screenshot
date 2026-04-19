@@ -18,20 +18,32 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const ANNOTATION_COLOR = '#ff2f2f';
 const ANNOTATION_STROKE = 4;
 const MOSAIC_BLOCK_SIZE = 14;
+const SNAP_DRAG_THRESHOLD = 5;
+const SNAP_MIN_WIDTH = 48;
+const SNAP_MIN_HEIGHT = 36;
+const SNAP_EDGE_THRESHOLD = 24;
+const SNAP_ANALYSIS_MAX_WIDTH = 720;
 const mosaicContext = mosaicLayer.getContext('2d');
 const mosaicScratchCanvas = document.createElement('canvas');
 const mosaicScratchContext = mosaicScratchCanvas.getContext('2d');
+const snapAnalysisCanvas = document.createElement('canvas');
+const snapAnalysisContext = snapAnalysisCanvas.getContext('2d', { willReadFrequently: true });
 let annotationRenderFrame = 0;
+let snapAnalysis = null;
 
 const state = {
   sessionId: null,
   ready: false,
   selection: null,
+  selectionConfirmed: false,
+  previewSelection: false,
   mode: 'rect',
   drawingSelection: false,
   drawingAnnotation: false,
+  pendingSnapCommit: false,
   anchorX: 0,
   anchorY: 0,
+  snapCandidates: [],
   annotations: [],
   draftAnnotation: null,
 };
