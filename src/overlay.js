@@ -588,9 +588,19 @@ function isPointInsideSelection(pointX, pointY) {
 }
 
 function getWindowSnapCandidate(pointerX, pointerY) {
-  return state.snapCandidates.find((candidate) =>
+  const matches = state.snapCandidates.filter((candidate) =>
     pointInRect(pointerX, pointerY, candidate.rect)
-  ) ?? null;
+  );
+
+  if (matches.length === 0) {
+    return null;
+  }
+
+  return matches.sort((left, right) => {
+    const leftArea = left.rect.width * left.rect.height;
+    const rightArea = right.rect.width * right.rect.height;
+    return leftArea - rightArea;
+  })[0];
 }
 
 function getSnapCandidate(pointerX, pointerY) {

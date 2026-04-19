@@ -367,6 +367,7 @@ function normalizeWindowSnapCandidate(item, display) {
     source: 'window',
     label: ownerName,
     title: String(item.title ?? ''),
+    layer: Number.isFinite(Number(item.layer)) ? Number(item.layer) : 0,
     rect,
   };
 }
@@ -376,7 +377,7 @@ async function getWindowSnapCandidates(display) {
     return [];
   }
 
-  const response = await requestNativeHelperServer({ type: 'windows' }, 1500).catch((error) => {
+  const response = await requestNativeHelperServer({ type: 'windows' }, 3500).catch((error) => {
     console.warn(`[${APP_NAME}] window snap candidates unavailable`, error.message);
     return null;
   });
