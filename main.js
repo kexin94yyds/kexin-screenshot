@@ -316,6 +316,81 @@ function requestNativeHelperServer(command, timeoutMs = 5000) {
   });
 }
 
+function clampRectToDisplay(rect, displayBounds) {
+  const left = Math.max(displayBounds.x, rect.x);
+  const top = Math.max(displayBounds.y, rect.y);
+  const right = Math.min(displayBounds.x + displayBounds.width, rect.x + rect.width);
+  const bottom = Math.min(displayBounds.y + displayBounds.height, rect.y + rect.height);
+  const width = right - left;
+  const height = bottom - top;
+
+  if (width < 40 || height < 40) {
+    return null;
+  }
+
+  return {
+    x: Math.round(left - displayBounds.x),
+    y: Math.round(top - displayBounds.y),
+    width: Math.round(width),
+    height: Math.round(height),
+  };
+}
+
+function normalizeWindowSnapCandidate(item, display) {
+  if (!item || typeof item !== 'object') {
+    return null;
+  }
+
+  const ownerName = String(item.ownerName ?? '');
+  if (!ownerName || ownerName === APP_NAME || ownerName.includes('QQShot')) {
+    return null;
+  }
+
+  const rawRect = {
+    x: Number(item.x),
+    y: Number(item.y),
+    width: Number(item.width),
+    height: Number(item.height),
+  };
+
+  if (!Object.values(rawRect).every(Number.isFinite)) {
+    return null;
+  }
+
+  const rect = clampRectToDisplay(rawRect, display.bounds);
+  if (!rect) {
+    return null;
+  }
+
+  return {
+    id: String(item.windowId ?? `${ownerName}-${rect.x}-${rect.y}`),
+    source: 'window',
+    label: ownerName,
+    title: String(item.title ?? ''),
+    rect,
+  };
+}
+
+async function getWindowSnapCandidates(display) {
+  if (process.platform !== 'darwin') {
+    return [];
+  }
+
+  const response = await requestNativeHelperServer({ type: 'windows' }, 1500).catch((error) => {
+    console.warn(`[${APP_NAME}] window snap candidates unavailable`, error.message);
+    return null;
+  });
+
+  if (!response?.snapCandidates || !Array.isArray(response.snapCandidates)) {
+    return [];
+  }
+
+  return response.snapCandidates
+    .map((item) => normalizeWindowSnapCandidate(item, display))
+    .filter(Boolean)
+    .slice(0, 80);
+}
+
 function getExpectedSourceSize(display) {
   return {
     width: Math.max(1, Math.round(display.bounds.width * display.scaleFactor)),
@@ -560,10 +635,12 @@ async function startCapture() {
     const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
     const overlayWindowPromise = ensureOverlayWindow();
     const capturePromise = captureDisplayImage(display);
+    const snapCandidatesPromise = getWindowSnapCandidates(display);
     const sessionId = Date.now();
-    const [currentOverlayWindow, capture] = await Promise.all([
+    const [currentOverlayWindow, capture, snapCandidates] = await Promise.all([
       overlayWindowPromise,
       capturePromise,
+      snapCandidatesPromise,
     ]);
     const sourceSize = capture.sourceSize;
 
@@ -609,6 +686,7 @@ async function startCapture() {
         width: display.bounds.width,
         height: display.bounds.height,
       },
+      snapCandidates,
     });
 
     if (!currentOverlayWindow.isVisible()) {
