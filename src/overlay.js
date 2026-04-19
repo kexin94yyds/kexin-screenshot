@@ -168,6 +168,162 @@ function createSvgNode(tagName) {
   return document.createElementNS(SVG_NS, tagName);
 }
 
+function buildSnapAnalysis() {
+  snapAnalysis = null;
+
+  const scale = Math.min(1, SNAP_ANALYSIS_MAX_WIDTH / Math.max(1, window.innerWidth));
+  const width = Math.max(1, Math.round(window.innerWidth * scale));
+  const height = Math.max(1, Math.round(window.innerHeight * scale));
+
+  snapAnalysisCanvas.width = width;
+  snapAnalysisCanvas.height = height;
+  snapAnalysisContext.clearRect(0, 0, width, height);
+  snapAnalysisContext.drawImage(imageLayer, 0, 0, width, height);
+
+  try {
+    snapAnalysis = {
+      width,
+      height,
+      scaleX: width / window.innerWidth,
+      scaleY: height / window.innerHeight,
+      data: snapAnalysisContext.getImageData(0, 0, width, height).data,
+    };
+  } catch {
+    snapAnalysis = null;
+  }
+}
+
+function snapPixelOffset(x, y) {
+  if (!snapAnalysis) {
+    return 0;
+  }
+
+  return (y * snapAnalysis.width + x) * 4;
+}
+
+function snapColorDiff(x1, y1, x2, y2) {
+  const offset1 = snapPixelOffset(x1, y1);
+  const offset2 = snapPixelOffset(x2, y2);
+  const data = snapAnalysis.data;
+  const red = Math.abs(data[offset1] - data[offset2]);
+  const green = Math.abs(data[offset1 + 1] - data[offset2 + 1]);
+  const blue = Math.abs(data[offset1 + 2] - data[offset2 + 2]);
+
+  return red * 0.299 + green * 0.587 + blue * 0.114;
+}
+
+function verticalEdgeScore(x, y, halfSpan) {
+  if (!snapAnalysis || x <= 0 || x >= snapAnalysis.width - 1) {
+    return 0;
+  }
+
+  const startY = clamp(y - halfSpan, 1, snapAnalysis.height - 2);
+  const endY = clamp(y + halfSpan, 1, snapAnalysis.height - 2);
+  let total = 0;
+  let count = 0;
+
+  for (let currentY = startY; currentY <= endY; currentY += 1) {
+    total += snapColorDiff(x - 1, currentY, x + 1, currentY);
+    count += 1;
+  }
+
+  return count ? total / count : 0;
+}
+
+function horizontalEdgeScore(x, y, halfSpan) {
+  if (!snapAnalysis || y <= 0 || y >= snapAnalysis.height - 1) {
+    return 0;
+  }
+
+  const startX = clamp(x - halfSpan, 1, snapAnalysis.width - 2);
+  const endX = clamp(x + halfSpan, 1, snapAnalysis.width - 2);
+  let total = 0;
+  let count = 0;
+
+  for (let currentX = startX; currentX <= endX; currentX += 1) {
+    total += snapColorDiff(currentX, y - 1, currentX, y + 1);
+    count += 1;
+  }
+
+  return count ? total / count : 0;
+}
+
+function findVerticalBoundary(startX, y, direction, minDistance) {
+  if (!snapAnalysis) {
+    return null;
+  }
+
+  const halfSpan = Math.max(12, Math.round(snapAnalysis.height * 0.018));
+
+  for (
+    let x = startX + direction * minDistance;
+    x > 1 && x < snapAnalysis.width - 2;
+    x += direction
+  ) {
+    if (verticalEdgeScore(x, y, halfSpan) >= SNAP_EDGE_THRESHOLD) {
+      return x;
+    }
+  }
+
+  return direction < 0 ? 0 : snapAnalysis.width - 1;
+}
+
+function findHorizontalBoundary(x, startY, direction, minDistance) {
+  if (!snapAnalysis) {
+    return null;
+  }
+
+  const halfSpan = Math.max(12, Math.round(snapAnalysis.width * 0.018));
+
+  for (
+    let y = startY + direction * minDistance;
+    y > 1 && y < snapAnalysis.height - 2;
+    y += direction
+  ) {
+    if (horizontalEdgeScore(x, y, halfSpan) >= SNAP_EDGE_THRESHOLD) {
+      return y;
+    }
+  }
+
+  return direction < 0 ? 0 : snapAnalysis.height - 1;
+}
+
+function getVisualSnapCandidate(pointerX, pointerY) {
+  if (!snapAnalysis) {
+    return null;
+  }
+
+  const x = clamp(Math.round(pointerX * snapAnalysis.scaleX), 1, snapAnalysis.width - 2);
+  const y = clamp(Math.round(pointerY * snapAnalysis.scaleY), 1, snapAnalysis.height - 2);
+  const minDistance = Math.max(4, Math.round(10 * snapAnalysis.scaleX));
+  const left = findVerticalBoundary(x, y, -1, minDistance);
+  const right = findVerticalBoundary(x, y, 1, minDistance);
+  const top = findHorizontalBoundary(x, y, -1, minDistance);
+  const bottom = findHorizontalBoundary(x, y, 1, minDistance);
+
+  if (left === null || right === null || top === null || bottom === null) {
+    return null;
+  }
+
+  const rect = clampRectToViewport({
+    x: left / snapAnalysis.scaleX,
+    y: top / snapAnalysis.scaleY,
+    width: (right - left) / snapAnalysis.scaleX,
+    height: (bottom - top) / snapAnalysis.scaleY,
+  });
+
+  if (!isUsableSnapRect(rect)) {
+    return null;
+  }
+
+  return {
+    id: `visual-${rect.x}-${rect.y}-${rect.width}-${rect.height}`,
+    source: 'visual',
+    label: '自动选区',
+    rect,
+  };
+}
+
 function cancelScheduledAnnotationRender() {
   if (!annotationRenderFrame) {
     return;
