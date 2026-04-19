@@ -93,6 +93,77 @@ function normalizeRect(startX, startY, endX, endY) {
   return { x, y, width, height };
 }
 
+function insetRect(rect, amount) {
+  return {
+    x: rect.x + amount,
+    y: rect.y + amount,
+    width: Math.max(1, rect.width - amount * 2),
+    height: Math.max(1, rect.height - amount * 2),
+  };
+}
+
+function clampRectToViewport(rect) {
+  const left = clamp(rect.x, 0, window.innerWidth);
+  const top = clamp(rect.y, 0, window.innerHeight);
+  const right = clamp(rect.x + rect.width, 0, window.innerWidth);
+  const bottom = clamp(rect.y + rect.height, 0, window.innerHeight);
+
+  return {
+    x: Math.round(left),
+    y: Math.round(top),
+    width: Math.round(Math.max(0, right - left)),
+    height: Math.round(Math.max(0, bottom - top)),
+  };
+}
+
+function isUsableSnapRect(rect) {
+  return rect.width >= SNAP_MIN_WIDTH && rect.height >= SNAP_MIN_HEIGHT;
+}
+
+function sameRect(left, right) {
+  if (!left || !right) {
+    return false;
+  }
+
+  return (
+    Math.abs(left.x - right.x) <= 1 &&
+    Math.abs(left.y - right.y) <= 1 &&
+    Math.abs(left.width - right.width) <= 1 &&
+    Math.abs(left.height - right.height) <= 1
+  );
+}
+
+function pointInRect(pointX, pointY, rect) {
+  return (
+    pointX >= rect.x &&
+    pointX <= rect.x + rect.width &&
+    pointY >= rect.y &&
+    pointY <= rect.y + rect.height
+  );
+}
+
+function normalizeSnapCandidates(candidates) {
+  if (!Array.isArray(candidates)) {
+    return [];
+  }
+
+  return candidates
+    .map((candidate, index) => {
+      const rect = clampRectToViewport(candidate.rect ?? candidate);
+      if (!isUsableSnapRect(rect)) {
+        return null;
+      }
+
+      return {
+        id: candidate.id ?? `candidate-${index}`,
+        source: candidate.source ?? 'window',
+        label: candidate.label ?? '自动选区',
+        rect: insetRect(rect, 1),
+      };
+    })
+    .filter(Boolean);
+}
+
 function createSvgNode(tagName) {
   return document.createElementNS(SVG_NS, tagName);
 }
