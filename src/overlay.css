@@ -1,11 +1,12 @@
 :root {
   color-scheme: dark;
-  --accent: #ff7a59;
-  --accent-strong: #ff5f3d;
-  --qq-red: #ff2f2f;
-  --panel: rgba(12, 12, 14, 0.88);
-  --line: rgba(255, 255, 255, 0.14);
-  --shadow: rgba(0, 0, 0, 0.35);
+  --accent: #f7f7f7;
+  --accent-strong: #ffffff;
+  --mark-red: #ff3b30;
+  --panel: rgba(18, 18, 20, 0.86);
+  --panel-soft: rgba(255, 255, 255, 0.1);
+  --line: rgba(255, 255, 255, 0.16);
+  --shadow: rgba(0, 0, 0, 0.28);
 }
 
 * {
@@ -20,9 +21,9 @@ body {
   height: 100%;
   overflow: hidden;
   font-family:
-    'SF Pro Display',
     'PingFang SC',
     'Microsoft YaHei',
+    Arial,
     sans-serif;
   cursor: crosshair;
   background: transparent;
@@ -52,7 +53,7 @@ body {
 }
 
 .mask {
-  background: rgba(4, 8, 12, 0.22);
+  background: rgba(0, 0, 0, 0.24);
   opacity: 0;
   transition: opacity 90ms ease-out;
 }
@@ -66,8 +67,8 @@ body {
   overflow: hidden;
   border-radius: 2px;
   box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.18);
+    0 14px 40px rgba(0, 0, 0, 0.26),
+    0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 .selection-image {
@@ -97,57 +98,58 @@ body {
 .selection-border {
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.22);
 }
 
 .selection.auto-snap {
   box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.24),
-    0 0 0 2px rgba(255, 122, 89, 0.95),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+    0 14px 40px rgba(0, 0, 0, 0.24),
+    0 0 0 2px rgba(255, 255, 255, 0.92),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.64);
 }
 
 .selection.auto-snap .selection-border {
-  border-color: rgba(255, 122, 89, 0.95);
+  border-color: rgba(255, 255, 255, 0.96);
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
 }
 
 .dimensions {
   position: absolute;
-  padding: 6px 10px;
-  border-radius: 999px;
+  padding: 5px 8px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
   color: #fff;
-  background: rgba(12, 12, 14, 0.84);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  background: rgba(18, 18, 20, 0.82);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
 }
 
 .toolbar {
   position: absolute;
   display: flex;
-  gap: 8px;
-  padding: 10px;
+  gap: 6px;
+  padding: 8px;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 8px;
   background: var(--panel);
-  backdrop-filter: blur(18px);
-  box-shadow: 0 18px 36px var(--shadow);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  box-shadow: 0 14px 30px var(--shadow);
   cursor: default;
 }
 
 .tool {
   appearance: none;
   border: 0;
-  border-radius: 12px;
-  padding: 0 14px;
-  height: 38px;
+  border-radius: 6px;
+  padding: 0 12px;
+  height: 34px;
   font: inherit;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   color: #f7f7f7;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--panel-soft);
   cursor: pointer;
   transition:
     transform 100ms ease,
@@ -156,24 +158,29 @@ body {
 
 .tool:hover {
   transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .tool.primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #202124;
+  background: var(--accent);
+}
+
+.tool.primary:hover {
+  background: var(--accent-strong);
 }
 
 .tool.active {
-  background: rgba(255, 47, 47, 0.2);
-  box-shadow: inset 0 0 0 1px rgba(255, 47, 47, 0.55);
+  background: rgba(255, 59, 48, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255, 59, 48, 0.52);
 }
 
 .tool.ghost {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.74);
 }
 
 .icon-tool {
-  width: 38px;
+  width: 34px;
   padding: 0;
   display: grid;
   place-items: center;
@@ -182,7 +189,7 @@ body {
 .rect-icon {
   width: 16px;
   height: 12px;
-  border: 2px solid var(--qq-red);
+  border: 2px solid var(--mark-red);
   border-radius: 2px;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
@@ -201,7 +208,7 @@ body {
   width: 11px;
   height: 3px;
   border-radius: 999px;
-  background: var(--qq-red);
+  background: var(--mark-red);
   transform: rotate(-28deg);
   transform-origin: left center;
 }
@@ -215,7 +222,7 @@ body {
   height: 0;
   border-top: 5px solid transparent;
   border-bottom: 5px solid transparent;
-  border-left: 9px solid var(--qq-red);
+  border-left: 9px solid var(--mark-red);
   transform: rotate(-28deg);
   transform-origin: center;
 }
@@ -264,16 +271,17 @@ body {
 .hint {
   position: absolute;
   left: 50%;
-  bottom: 26px;
+  bottom: 22px;
   transform: translateX(-50%);
-  padding: 10px 16px;
-  border-radius: 999px;
+  padding: 8px 12px;
+  border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(10, 10, 12, 0.68);
-  color: rgba(255, 255, 255, 0.9);
+  background: rgba(18, 18, 20, 0.72);
+  color: rgba(255, 255, 255, 0.82);
   font-size: 12px;
-  letter-spacing: 0.02em;
-  backdrop-filter: blur(14px);
+  letter-spacing: 0;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .hint span {
