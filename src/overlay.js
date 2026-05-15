@@ -23,6 +23,7 @@ const SNAP_MIN_WIDTH = 48;
 const SNAP_MIN_HEIGHT = 36;
 const SNAP_EDGE_THRESHOLD = 24;
 const SNAP_ANALYSIS_MAX_WIDTH = 720;
+const EMPTY_IMAGE_SRC = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 const mosaicContext = mosaicLayer.getContext('2d');
 const mosaicScratchCanvas = document.createElement('canvas');
 const mosaicScratchContext = mosaicScratchCanvas.getContext('2d');
@@ -510,6 +511,10 @@ function resetAnnotations() {
   renderAnnotations();
 }
 
+function hasAnnotations() {
+  return state.annotations.length > 0;
+}
+
 function hideSelectionUi() {
   selection.classList.add('hidden');
   selection.classList.remove('auto-snap');
@@ -521,6 +526,32 @@ function hideSelectionUi() {
   state.previewSelection = false;
   state.pendingSnapCommit = false;
   resetAnnotations();
+}
+
+function clearCaptureResources() {
+  cancelScheduledAnnotationRender();
+  hideSelectionUi();
+
+  state.sessionId = null;
+  state.ready = false;
+  state.snapCandidates = [];
+
+  snapAnalysis = null;
+  snapAnalysisCanvas.width = 1;
+  snapAnalysisCanvas.height = 1;
+  snapAnalysisContext.clearRect(0, 0, 1, 1);
+
+  mosaicScratchCanvas.width = 1;
+  mosaicScratchCanvas.height = 1;
+  mosaicScratchContext.clearRect(0, 0, 1, 1);
+
+  mosaicLayer.width = 1;
+  mosaicLayer.height = 1;
+  mosaicContext.clearRect(0, 0, 1, 1);
+  annotationLayer.replaceChildren();
+
+  imageLayer.src = EMPTY_IMAGE_SRC;
+  selectionImage.src = EMPTY_IMAGE_SRC;
 }
 
 function showSelectionUi(rect, options = {}) {
@@ -804,7 +835,10 @@ async function cancelCapture() {
     return;
   }
 
-  await window.qqShot.cancelCapture(state.sessionId);
+  const result = await window.qqShot.cancelCapture(state.sessionId);
+  if (result?.ok) {
+    clearCaptureResources();
+  }
 }
 
 async function copySelection() {
@@ -816,7 +850,13 @@ async function copySelection() {
   saveButton.disabled = true;
 
   try {
-    await window.qqShot.copyRenderedCapture(state.sessionId, getRenderedCaptureDataUrl());
+    const result = hasAnnotations()
+      ? await window.qqShot.copyRenderedCapture(state.sessionId, getRenderedCaptureDataUrl())
+      : await window.qqShot.copyCapture(state.sessionId, state.selection);
+
+    if (result?.ok) {
+      clearCaptureResources();
+    }
   } finally {
     copyButton.disabled = false;
     saveButton.disabled = false;
@@ -832,7 +872,13 @@ async function saveSelection() {
   saveButton.disabled = true;
 
   try {
-    await window.qqShot.saveRenderedCapture(state.sessionId, getRenderedCaptureDataUrl());
+    const result = hasAnnotations()
+      ? await window.qqShot.saveRenderedCapture(state.sessionId, getRenderedCaptureDataUrl())
+      : await window.qqShot.saveCapture(state.sessionId, state.selection);
+
+    if (result?.ok || result?.canceled) {
+      clearCaptureResources();
+    }
   } finally {
     copyButton.disabled = false;
     saveButton.disabled = false;
