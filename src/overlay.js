@@ -672,7 +672,12 @@ function getSnapCandidate(pointerX, pointerY) {
 }
 
 function updateSnapPreviewNow(pointerX, pointerY) {
-  if (state.selectionConfirmed || state.drawingSelection || state.drawingAnnotation) {
+  if (
+    state.selectionConfirmed ||
+    state.drawingSelection ||
+    state.drawingAnnotation ||
+    state.pendingSnapCommit
+  ) {
     return;
   }
 
@@ -694,7 +699,12 @@ function updateSnapPreviewNow(pointerX, pointerY) {
 }
 
 function scheduleSnapPreview(pointerX, pointerY) {
-  if (state.selectionConfirmed || state.drawingSelection || state.drawingAnnotation) {
+  if (
+    state.selectionConfirmed ||
+    state.drawingSelection ||
+    state.drawingAnnotation ||
+    state.pendingSnapCommit
+  ) {
     cancelScheduledSnapPreview();
     return;
   }
