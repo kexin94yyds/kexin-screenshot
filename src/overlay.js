@@ -23,6 +23,7 @@ const SNAP_MIN_WIDTH = 48;
 const SNAP_MIN_HEIGHT = 36;
 const SNAP_EDGE_THRESHOLD = 24;
 const SNAP_ANALYSIS_MAX_WIDTH = 720;
+const SNAP_PREVIEW_MOVE_THRESHOLD = 4;
 const EMPTY_IMAGE_SRC = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 const mosaicContext = mosaicLayer.getContext('2d');
 const mosaicScratchCanvas = document.createElement('canvas');
@@ -31,6 +32,9 @@ const snapAnalysisCanvas = document.createElement('canvas');
 const snapAnalysisContext = snapAnalysisCanvas.getContext('2d', { willReadFrequently: true });
 let annotationRenderFrame = 0;
 let snapAnalysis = null;
+let snapPreviewFrame = 0;
+let pendingSnapPointer = null;
+let lastSnapPointer = null;
 
 const state = {
   sessionId: null,
@@ -334,6 +338,15 @@ function cancelScheduledAnnotationRender() {
   annotationRenderFrame = 0;
 }
 
+function cancelScheduledSnapPreview() {
+  if (snapPreviewFrame) {
+    cancelAnimationFrame(snapPreviewFrame);
+    snapPreviewFrame = 0;
+  }
+
+  pendingSnapPointer = null;
+}
+
 function scheduleAnnotationRender() {
   if (annotationRenderFrame) {
     return;
@@ -530,11 +543,13 @@ function hideSelectionUi() {
 
 function clearCaptureResources() {
   cancelScheduledAnnotationRender();
+  cancelScheduledSnapPreview();
   hideSelectionUi();
 
   state.sessionId = null;
   state.ready = false;
   state.snapCandidates = [];
+  lastSnapPointer = null;
 
   snapAnalysis = null;
   snapAnalysisCanvas.width = 1;
@@ -656,7 +671,7 @@ function getSnapCandidate(pointerX, pointerY) {
   return windowCandidate;
 }
 
-function updateSnapPreview(pointerX, pointerY) {
+function updateSnapPreviewNow(pointerX, pointerY) {
   if (state.selectionConfirmed || state.drawingSelection || state.drawingAnnotation) {
     return;
   }
@@ -676,6 +691,41 @@ function updateSnapPreview(pointerX, pointerY) {
 
   resetAnnotations();
   showSelectionUi(candidate.rect, { preview: true, label: candidate.label });
+}
+
+function scheduleSnapPreview(pointerX, pointerY) {
+  if (state.selectionConfirmed || state.drawingSelection || state.drawingAnnotation) {
+    cancelScheduledSnapPreview();
+    return;
+  }
+
+  pendingSnapPointer = { x: pointerX, y: pointerY };
+
+  if (snapPreviewFrame) {
+    return;
+  }
+
+  snapPreviewFrame = requestAnimationFrame(() => {
+    snapPreviewFrame = 0;
+
+    const pointer = pendingSnapPointer;
+    pendingSnapPointer = null;
+
+    if (!pointer) {
+      return;
+    }
+
+    if (
+      lastSnapPointer &&
+      Math.hypot(pointer.x - lastSnapPointer.x, pointer.y - lastSnapPointer.y) <
+        SNAP_PREVIEW_MOVE_THRESHOLD
+    ) {
+      return;
+    }
+
+    lastSnapPointer = pointer;
+    updateSnapPreviewNow(pointer.x, pointer.y);
+  });
 }
 
 function commitSnapPreview() {
@@ -936,6 +986,7 @@ window.addEventListener('mousemove', (event) => {
       return;
     }
 
+    cancelScheduledSnapPreview();
     state.pendingSnapCommit = false;
     state.previewSelection = false;
     state.selectionConfirmed = false;
@@ -956,7 +1007,7 @@ window.addEventListener('mousemove', (event) => {
     return;
   }
 
-  updateSnapPreview(pointerX, pointerY);
+  scheduleSnapPreview(pointerX, pointerY);
 });
 
 window.addEventListener('mouseup', () => {
@@ -1086,6 +1137,8 @@ window.qqShot.onCaptureData(async (payload) => {
   state.drawingAnnotation = false;
   state.pendingSnapCommit = false;
   state.snapCandidates = normalizeSnapCandidates(payload.snapCandidates);
+  cancelScheduledSnapPreview();
+  lastSnapPointer = null;
   hideSelectionUi();
   copyButton.disabled = false;
   saveButton.disabled = false;
